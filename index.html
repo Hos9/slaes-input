@@ -767,12 +767,20 @@
         document.getElementById("settingsModal").classList.remove("show");
       }
       async function saveCloudSettings() {
-        const url = document
-          .getElementById("sbUrl")
-          .value.trim()
-          .replace(/\/+$/, "");
-        const key = document.getElementById("sbKey").value.trim();
+        const url = "https://tbboptkqgegrlugmcpgx.supabase.co";
+        // .getElementById("sbUrl")
+        // .value.trim()
+        // .replace(/\/+$/, "");
+        const key =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8";
         const statusEl = document.getElementById("sbStatus");
+
+        // const url = document
+        //   .getElementById("sbUrl")
+        //   .value.trim()
+        //   .replace(/\/+$/, "");
+        // const key = document.getElementById("sbKey").value.trim();
+        // const statusEl = document.getElementById("sbStatus");
 
         if (!url || !key) {
           statusEl.className = "statusLine bad";
