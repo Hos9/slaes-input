@@ -634,19 +634,9 @@
               </div>
             </div>
           </div>
-          <div
-            id="filterTotalRow"
-            class="itemsTotalRow"
-            style="display: none; justify-content: space-between"
-          >
+          <div id="filterTotalRow" class="itemsTotalRow" style="display: none; justify-content: space-between">
             <span>Total for <strong id="filterTotalDate"></strong></span>
-            <span
-              ><strong id="filterTotalAmount">0.00</strong> (<span
-                id="filterTotalCount"
-                >0</span
-              >
-              entries)</span
-            >
+            <span><strong id="filterTotalAmount">0.00</strong> (<span id="filterTotalCount">0</span> entries)</span>
           </div>
           <table>
             <thead>
@@ -727,12 +717,7 @@
                 <button
                   type="button"
                   class="iconBtn"
-                  style="
-                    width: 20px;
-                    height: 20px;
-                    font-size: 11px;
-                    margin-left: 4px;
-                  "
+                  style="width: 20px; height: 20px; font-size: 11px; margin-left: 4px"
                   title="Refresh from Sales Details"
                   onclick="refreshSalesTotal()"
                 >
@@ -787,14 +772,7 @@
         <div class="card">
           <div class="detailsHead">
             <h2 style="margin: 0">Daily Details</h2>
-            <div
-              style="
-                display: flex;
-                gap: 8px;
-                align-items: center;
-                flex-wrap: wrap;
-              "
-            >
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
               <button
                 class="ghost"
                 style="padding: 8px 12px; font-size: 13px"
@@ -826,11 +804,7 @@
                 style="display: none"
                 onchange="renderDailyDetails()"
               />
-              <span
-                id="dailyFilterToLabel"
-                style="display: none; font-size: 13px; color: var(--muted)"
-                >to</span
-              >
+              <span id="dailyFilterToLabel" style="display: none; font-size: 13px; color: var(--muted)">to</span>
               <input
                 type="date"
                 id="dailyFilterTo"
@@ -840,16 +814,7 @@
             </div>
           </div>
 
-          <div
-            id="dailyTotalRow"
-            class="itemsTotalRow"
-            style="
-              display: none;
-              flex-wrap: wrap;
-              gap: 14px;
-              justify-content: flex-start;
-            "
-          >
+          <div id="dailyTotalRow" class="itemsTotalRow" style="display: none; flex-wrap: wrap; gap: 14px; justify-content: flex-start">
             <span>Opening: <strong id="dtOpening">0.00</strong></span>
             <span>Received: <strong id="dtReceived">0.00</strong></span>
             <span>Purchase: <strong id="dtPurchase">0.00</strong></span>
@@ -920,17 +885,15 @@
           </div>
 
           <div class="sub" style="margin-top: 4px">
-            Add a due adjustment (optional — leave amount blank to just save the
-            name/notes).
+            Add a due adjustment (optional — leave amount blank to just
+            save the name/notes).
           </div>
           <div class="rowTop">
             <div class="field">
               <label>Type</label>
               <select id="custAdjType">
-                <option value="due">বাকির পরিমান</option>
-                <!-- Total Due (customer owes more) -->
-                <option value="paid">নগদ পরিশোধ</option>
-                <!-- Paid (customer paid back) -->
+                <option value="due">Total Due (customer owes more)</option>
+                <option value="paid">Paid (customer paid back)</option>
               </select>
             </div>
             <div class="field">
@@ -965,7 +928,9 @@
           </div>
 
           <div class="actions">
-            <button class="ghost" onclick="resetCustomerForm()">Clear</button>
+            <button class="ghost" onclick="resetCustomerForm()">
+              Clear
+            </button>
             <button class="primary" id="custSaveBtn" onclick="saveCustomer()">
               Save Customer
             </button>
@@ -1654,25 +1619,18 @@
       }
 
       function recalcPaidToHome() {
-        const opening =
-          parseFloat(document.getElementById("openingCash").value) || 0;
-        const received =
-          parseFloat(document.getElementById("receivedFromHome").value) || 0;
-        const purchase =
-          parseFloat(document.getElementById("todaysPurchase").value) || 0;
-        const sales =
-          parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
-        const closing =
-          parseFloat(document.getElementById("closingCash").value) || 0;
+        const opening = parseFloat(document.getElementById("openingCash").value) || 0;
+        const received = parseFloat(document.getElementById("receivedFromHome").value) || 0;
+        const purchase = parseFloat(document.getElementById("todaysPurchase").value) || 0;
+        const sales = parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
+        const closing = parseFloat(document.getElementById("closingCash").value) || 0;
         const paid = opening + received - purchase + sales - closing;
-        document.getElementById("paidToHomeDisplay").textContent =
-          paid.toFixed(2);
+        document.getElementById("paidToHomeDisplay").textContent = paid.toFixed(2);
         return paid;
       }
 
       async function refreshSalesTotal() {
-        const iso =
-          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const iso = document.getElementById("dayEndDate").dataset.iso || todayISO();
         const salesField = document.getElementById("dayEndSales");
         salesField.value = "Loading...";
         const sales = await fetchSalesTotalForDate(iso);
@@ -1692,44 +1650,28 @@
         document.getElementById("closingCash").value = "";
 
         // auto-fill opening cash from the most recent saved entry's closing cash
-        const local = loadLocalEntries2()
-          .slice()
-          .sort((a, b) => b.date.localeCompare(a.date));
+        const local = loadLocalEntries2().slice().sort((a, b) => b.date.localeCompare(a.date));
         const mostRecent = local.find((e) => e.date !== iso);
-        document.getElementById("openingCash").value = mostRecent
-          ? mostRecent.closing
-          : "";
+        document.getElementById("openingCash").value = mostRecent ? mostRecent.closing : "";
 
         await refreshSalesTotal();
       }
 
-      [
-        "openingCash",
-        "receivedFromHome",
-        "todaysPurchase",
-        "closingCash",
-      ].forEach((id) => {
+      ["openingCash", "receivedFromHome", "todaysPurchase", "closingCash"].forEach((id) => {
         document.getElementById(id).addEventListener("input", recalcPaidToHome);
       });
 
       async function saveDayEnd() {
-        const iso =
-          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const iso = document.getElementById("dayEndDate").dataset.iso || todayISO();
         const paid = recalcPaidToHome();
         const entry = {
           id: "d_" + iso,
           date: iso,
-          opening:
-            parseFloat(document.getElementById("openingCash").value) || 0,
-          received:
-            parseFloat(document.getElementById("receivedFromHome").value) || 0,
-          purchase:
-            parseFloat(document.getElementById("todaysPurchase").value) || 0,
-          sales:
-            parseFloat(document.getElementById("dayEndSales").dataset.value) ||
-            0,
-          closing:
-            parseFloat(document.getElementById("closingCash").value) || 0,
+          opening: parseFloat(document.getElementById("openingCash").value) || 0,
+          received: parseFloat(document.getElementById("receivedFromHome").value) || 0,
+          purchase: parseFloat(document.getElementById("todaysPurchase").value) || 0,
+          sales: parseFloat(document.getElementById("dayEndSales").dataset.value) || 0,
+          closing: parseFloat(document.getElementById("closingCash").value) || 0,
           paid: Math.round(paid * 100) / 100,
         };
 
@@ -1761,16 +1703,11 @@
       /* ---------- Daily Details: filter + list ---------- */
       function onFilterModeChange() {
         const mode = document.getElementById("dailyFilterMode").value;
-        document.getElementById("dailyFilterDay").style.display =
-          mode === "day" ? "" : "none";
-        document.getElementById("dailyFilterMonth").style.display =
-          mode === "month" ? "" : "none";
-        document.getElementById("dailyFilterFrom").style.display =
-          mode === "custom" ? "" : "none";
-        document.getElementById("dailyFilterToLabel").style.display =
-          mode === "custom" ? "" : "none";
-        document.getElementById("dailyFilterTo").style.display =
-          mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterDay").style.display = mode === "day" ? "" : "none";
+        document.getElementById("dailyFilterMonth").style.display = mode === "month" ? "" : "none";
+        document.getElementById("dailyFilterFrom").style.display = mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterToLabel").style.display = mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterTo").style.display = mode === "custom" ? "" : "none";
         renderDailyDetails();
       }
 
@@ -1799,21 +1736,16 @@
           filtered = d ? entries.filter((e) => e.date === d) : entries;
         } else if (mode === "month") {
           const m = document.getElementById("dailyFilterMonth").value;
-          filtered = m
-            ? entries.filter((e) => e.date.slice(0, 7) === m)
-            : entries;
+          filtered = m ? entries.filter((e) => e.date.slice(0, 7) === m) : entries;
         } else if (mode === "custom") {
           const from = document.getElementById("dailyFilterFrom").value;
           const to = document.getElementById("dailyFilterTo").value;
-          filtered = entries.filter(
-            (e) => (!from || e.date >= from) && (!to || e.date <= to),
-          );
+          filtered = entries.filter((e) => (!from || e.date >= from) && (!to || e.date <= to));
         }
 
         const body = document.getElementById("dailyDetailsBody");
         body.innerHTML = "";
-        document.getElementById("dailyEmptyState").style.display =
-          filtered.length ? "none" : "block";
+        document.getElementById("dailyEmptyState").style.display = filtered.length ? "none" : "block";
 
         filtered.forEach((e) => {
           const tr = document.createElement("tr");
@@ -1831,21 +1763,14 @@
         });
 
         const sum = (key) => filtered.reduce((s, e) => s + e[key], 0);
-        document.getElementById("dtOpening").textContent =
-          sum("opening").toFixed(2);
-        document.getElementById("dtReceived").textContent =
-          sum("received").toFixed(2);
-        document.getElementById("dtPurchase").textContent =
-          sum("purchase").toFixed(2);
-        document.getElementById("dtSales").textContent =
-          sum("sales").toFixed(2);
-        document.getElementById("dtClosing").textContent =
-          sum("closing").toFixed(2);
+        document.getElementById("dtOpening").textContent = sum("opening").toFixed(2);
+        document.getElementById("dtReceived").textContent = sum("received").toFixed(2);
+        document.getElementById("dtPurchase").textContent = sum("purchase").toFixed(2);
+        document.getElementById("dtSales").textContent = sum("sales").toFixed(2);
+        document.getElementById("dtClosing").textContent = sum("closing").toFixed(2);
         document.getElementById("dtPaid").textContent = sum("paid").toFixed(2);
         document.getElementById("dtCount").textContent = filtered.length;
-        document.getElementById("dailyTotalRow").style.display = filtered.length
-          ? "flex"
-          : "none";
+        document.getElementById("dailyTotalRow").style.display = filtered.length ? "flex" : "none";
       }
 
       async function deleteDayEnd(id) {
@@ -1887,11 +1812,7 @@
         if (!adjustments.length && raw.due) {
           // migrate a legacy single-balance record into one ledger line
           adjustments = [
-            {
-              type: "due",
-              amount: Number(raw.due) || 0,
-              date: raw.updated || todayISO(),
-            },
+            { type: "due", amount: Number(raw.due) || 0, date: raw.updated || todayISO() },
           ];
         }
         return {
@@ -2034,8 +1955,7 @@
           mobile,
           notes,
           adjustments,
-          updated:
-            adjAmount > 0 ? adjDate : existing ? existing.updated : todayISO(),
+          updated: adjAmount > 0 ? adjDate : existing ? existing.updated : todayISO(),
         });
 
         const local = loadLocalEntries3().filter((e) => e.id !== entry.id);
@@ -2077,9 +1997,7 @@
         document.getElementById("custAdjDate").value = todayISO();
         document.getElementById("custNotes").value = c.notes || "";
         clearCustomerError();
-        document
-          .getElementById("custName")
-          .scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("custName").scrollIntoView({ behavior: "smooth", block: "center" });
       }
 
       async function deleteCustomer(id) {
@@ -2157,10 +2075,7 @@
           .reduce((s, e) => s + e.due, 0)
           .toFixed(2);
 
-        const q = document
-          .getElementById("custSearch")
-          .value.trim()
-          .toLowerCase();
+        const q = document.getElementById("custSearch").value.trim().toLowerCase();
         let filtered = entries;
         if (q) {
           filtered = entries.filter(
@@ -2185,9 +2100,9 @@
       <td><button class="expandBtn" onclick="toggleCustExpand('${c.id}')">Details</button></td>
       <td class="rowActions">
         <button class="iconBtn" title="Edit" onclick="editCustomer('${c.id}')">✎</button>
+        <button class="iconBtn" title="Delete" onclick="deleteCustomer('${c.id}')">✕</button>
       </td>
     `;
-          // <button class="iconBtn" title="Delete" onclick="deleteCustomer('${c.id}')">✕</button>
           body.appendChild(tr);
 
           const sortedAdj = c.adjustments

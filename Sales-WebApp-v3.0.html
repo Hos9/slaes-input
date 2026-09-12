@@ -634,19 +634,9 @@
               </div>
             </div>
           </div>
-          <div
-            id="filterTotalRow"
-            class="itemsTotalRow"
-            style="display: none; justify-content: space-between"
-          >
+          <div id="filterTotalRow" class="itemsTotalRow" style="display: none; justify-content: space-between">
             <span>Total for <strong id="filterTotalDate"></strong></span>
-            <span
-              ><strong id="filterTotalAmount">0.00</strong> (<span
-                id="filterTotalCount"
-                >0</span
-              >
-              entries)</span
-            >
+            <span><strong id="filterTotalAmount">0.00</strong> (<span id="filterTotalCount">0</span> entries)</span>
           </div>
           <table>
             <thead>
@@ -727,12 +717,7 @@
                 <button
                   type="button"
                   class="iconBtn"
-                  style="
-                    width: 20px;
-                    height: 20px;
-                    font-size: 11px;
-                    margin-left: 4px;
-                  "
+                  style="width: 20px; height: 20px; font-size: 11px; margin-left: 4px"
                   title="Refresh from Sales Details"
                   onclick="refreshSalesTotal()"
                 >
@@ -787,14 +772,7 @@
         <div class="card">
           <div class="detailsHead">
             <h2 style="margin: 0">Daily Details</h2>
-            <div
-              style="
-                display: flex;
-                gap: 8px;
-                align-items: center;
-                flex-wrap: wrap;
-              "
-            >
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
               <button
                 class="ghost"
                 style="padding: 8px 12px; font-size: 13px"
@@ -826,11 +804,7 @@
                 style="display: none"
                 onchange="renderDailyDetails()"
               />
-              <span
-                id="dailyFilterToLabel"
-                style="display: none; font-size: 13px; color: var(--muted)"
-                >to</span
-              >
+              <span id="dailyFilterToLabel" style="display: none; font-size: 13px; color: var(--muted)">to</span>
               <input
                 type="date"
                 id="dailyFilterTo"
@@ -840,16 +814,7 @@
             </div>
           </div>
 
-          <div
-            id="dailyTotalRow"
-            class="itemsTotalRow"
-            style="
-              display: none;
-              flex-wrap: wrap;
-              gap: 14px;
-              justify-content: flex-start;
-            "
-          >
+          <div id="dailyTotalRow" class="itemsTotalRow" style="display: none; flex-wrap: wrap; gap: 14px; justify-content: flex-start">
             <span>Opening: <strong id="dtOpening">0.00</strong></span>
             <span>Received: <strong id="dtReceived">0.00</strong></span>
             <span>Purchase: <strong id="dtPurchase">0.00</strong></span>
@@ -896,8 +861,8 @@
         <div class="card">
           <h2 id="custFormTitle">Add / Update Customer Due</h2>
           <div class="sub">
-            Enter the customer's mobile number to find or create them, then
-            optionally log a due or payment adjustment.
+            Enter the mobile number to add a new customer, or edit an
+            existing one from the list below.
           </div>
 
           <div class="rowTop">
@@ -919,37 +884,17 @@
             </div>
           </div>
 
-          <div class="sub" style="margin-top: 4px">
-            Add a due adjustment (optional — leave amount blank to just save the
-            name/notes).
-          </div>
           <div class="rowTop">
             <div class="field">
-              <label>Type</label>
-              <select id="custAdjType">
-                <option value="due">বাকির পরিমান</option>
-                <!-- Total Due (customer owes more) -->
-                <option value="paid">নগদ পরিশোধ</option>
-                <!-- Paid (customer paid back) -->
-              </select>
-            </div>
-            <div class="field">
-              <label>Amount</label>
+              <label>Due Amount</label>
               <input
                 type="number"
-                id="custAdjAmount"
+                id="custDue"
                 step="0.01"
                 min="0"
                 placeholder="0.00"
               />
             </div>
-            <div class="field">
-              <label>Date</label>
-              <input type="date" id="custAdjDate" />
-            </div>
-          </div>
-
-          <div class="rowTop">
             <div class="field">
               <label>Notes (optional)</label>
               <input
@@ -965,7 +910,9 @@
           </div>
 
           <div class="actions">
-            <button class="ghost" onclick="resetCustomerForm()">Clear</button>
+            <button class="ghost" onclick="resetCustomerForm()">
+              Clear
+            </button>
             <button class="primary" id="custSaveBtn" onclick="saveCustomer()">
               Save Customer
             </button>
@@ -1654,25 +1601,18 @@
       }
 
       function recalcPaidToHome() {
-        const opening =
-          parseFloat(document.getElementById("openingCash").value) || 0;
-        const received =
-          parseFloat(document.getElementById("receivedFromHome").value) || 0;
-        const purchase =
-          parseFloat(document.getElementById("todaysPurchase").value) || 0;
-        const sales =
-          parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
-        const closing =
-          parseFloat(document.getElementById("closingCash").value) || 0;
+        const opening = parseFloat(document.getElementById("openingCash").value) || 0;
+        const received = parseFloat(document.getElementById("receivedFromHome").value) || 0;
+        const purchase = parseFloat(document.getElementById("todaysPurchase").value) || 0;
+        const sales = parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
+        const closing = parseFloat(document.getElementById("closingCash").value) || 0;
         const paid = opening + received - purchase + sales - closing;
-        document.getElementById("paidToHomeDisplay").textContent =
-          paid.toFixed(2);
+        document.getElementById("paidToHomeDisplay").textContent = paid.toFixed(2);
         return paid;
       }
 
       async function refreshSalesTotal() {
-        const iso =
-          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const iso = document.getElementById("dayEndDate").dataset.iso || todayISO();
         const salesField = document.getElementById("dayEndSales");
         salesField.value = "Loading...";
         const sales = await fetchSalesTotalForDate(iso);
@@ -1692,44 +1632,28 @@
         document.getElementById("closingCash").value = "";
 
         // auto-fill opening cash from the most recent saved entry's closing cash
-        const local = loadLocalEntries2()
-          .slice()
-          .sort((a, b) => b.date.localeCompare(a.date));
+        const local = loadLocalEntries2().slice().sort((a, b) => b.date.localeCompare(a.date));
         const mostRecent = local.find((e) => e.date !== iso);
-        document.getElementById("openingCash").value = mostRecent
-          ? mostRecent.closing
-          : "";
+        document.getElementById("openingCash").value = mostRecent ? mostRecent.closing : "";
 
         await refreshSalesTotal();
       }
 
-      [
-        "openingCash",
-        "receivedFromHome",
-        "todaysPurchase",
-        "closingCash",
-      ].forEach((id) => {
+      ["openingCash", "receivedFromHome", "todaysPurchase", "closingCash"].forEach((id) => {
         document.getElementById(id).addEventListener("input", recalcPaidToHome);
       });
 
       async function saveDayEnd() {
-        const iso =
-          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const iso = document.getElementById("dayEndDate").dataset.iso || todayISO();
         const paid = recalcPaidToHome();
         const entry = {
           id: "d_" + iso,
           date: iso,
-          opening:
-            parseFloat(document.getElementById("openingCash").value) || 0,
-          received:
-            parseFloat(document.getElementById("receivedFromHome").value) || 0,
-          purchase:
-            parseFloat(document.getElementById("todaysPurchase").value) || 0,
-          sales:
-            parseFloat(document.getElementById("dayEndSales").dataset.value) ||
-            0,
-          closing:
-            parseFloat(document.getElementById("closingCash").value) || 0,
+          opening: parseFloat(document.getElementById("openingCash").value) || 0,
+          received: parseFloat(document.getElementById("receivedFromHome").value) || 0,
+          purchase: parseFloat(document.getElementById("todaysPurchase").value) || 0,
+          sales: parseFloat(document.getElementById("dayEndSales").dataset.value) || 0,
+          closing: parseFloat(document.getElementById("closingCash").value) || 0,
           paid: Math.round(paid * 100) / 100,
         };
 
@@ -1761,16 +1685,11 @@
       /* ---------- Daily Details: filter + list ---------- */
       function onFilterModeChange() {
         const mode = document.getElementById("dailyFilterMode").value;
-        document.getElementById("dailyFilterDay").style.display =
-          mode === "day" ? "" : "none";
-        document.getElementById("dailyFilterMonth").style.display =
-          mode === "month" ? "" : "none";
-        document.getElementById("dailyFilterFrom").style.display =
-          mode === "custom" ? "" : "none";
-        document.getElementById("dailyFilterToLabel").style.display =
-          mode === "custom" ? "" : "none";
-        document.getElementById("dailyFilterTo").style.display =
-          mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterDay").style.display = mode === "day" ? "" : "none";
+        document.getElementById("dailyFilterMonth").style.display = mode === "month" ? "" : "none";
+        document.getElementById("dailyFilterFrom").style.display = mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterToLabel").style.display = mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterTo").style.display = mode === "custom" ? "" : "none";
         renderDailyDetails();
       }
 
@@ -1799,21 +1718,16 @@
           filtered = d ? entries.filter((e) => e.date === d) : entries;
         } else if (mode === "month") {
           const m = document.getElementById("dailyFilterMonth").value;
-          filtered = m
-            ? entries.filter((e) => e.date.slice(0, 7) === m)
-            : entries;
+          filtered = m ? entries.filter((e) => e.date.slice(0, 7) === m) : entries;
         } else if (mode === "custom") {
           const from = document.getElementById("dailyFilterFrom").value;
           const to = document.getElementById("dailyFilterTo").value;
-          filtered = entries.filter(
-            (e) => (!from || e.date >= from) && (!to || e.date <= to),
-          );
+          filtered = entries.filter((e) => (!from || e.date >= from) && (!to || e.date <= to));
         }
 
         const body = document.getElementById("dailyDetailsBody");
         body.innerHTML = "";
-        document.getElementById("dailyEmptyState").style.display =
-          filtered.length ? "none" : "block";
+        document.getElementById("dailyEmptyState").style.display = filtered.length ? "none" : "block";
 
         filtered.forEach((e) => {
           const tr = document.createElement("tr");
@@ -1831,21 +1745,14 @@
         });
 
         const sum = (key) => filtered.reduce((s, e) => s + e[key], 0);
-        document.getElementById("dtOpening").textContent =
-          sum("opening").toFixed(2);
-        document.getElementById("dtReceived").textContent =
-          sum("received").toFixed(2);
-        document.getElementById("dtPurchase").textContent =
-          sum("purchase").toFixed(2);
-        document.getElementById("dtSales").textContent =
-          sum("sales").toFixed(2);
-        document.getElementById("dtClosing").textContent =
-          sum("closing").toFixed(2);
+        document.getElementById("dtOpening").textContent = sum("opening").toFixed(2);
+        document.getElementById("dtReceived").textContent = sum("received").toFixed(2);
+        document.getElementById("dtPurchase").textContent = sum("purchase").toFixed(2);
+        document.getElementById("dtSales").textContent = sum("sales").toFixed(2);
+        document.getElementById("dtClosing").textContent = sum("closing").toFixed(2);
         document.getElementById("dtPaid").textContent = sum("paid").toFixed(2);
         document.getElementById("dtCount").textContent = filtered.length;
-        document.getElementById("dailyTotalRow").style.display = filtered.length
-          ? "flex"
-          : "none";
+        document.getElementById("dailyTotalRow").style.display = filtered.length ? "flex" : "none";
       }
 
       async function deleteDayEnd(id) {
@@ -1875,36 +1782,6 @@
       let customersCache = [];
       let editingCustomerId = null;
 
-      function calcDue(adjustments) {
-        return adjustments.reduce(
-          (s, a) => s + (a.type === "paid" ? -a.amount : a.amount),
-          0,
-        );
-      }
-
-      function normalizeCustomer(raw) {
-        let adjustments = Array.isArray(raw.adjustments) ? raw.adjustments : [];
-        if (!adjustments.length && raw.due) {
-          // migrate a legacy single-balance record into one ledger line
-          adjustments = [
-            {
-              type: "due",
-              amount: Number(raw.due) || 0,
-              date: raw.updated || todayISO(),
-            },
-          ];
-        }
-        return {
-          id: raw.id,
-          name: raw.name,
-          mobile: raw.mobile,
-          notes: raw.notes || "",
-          adjustments,
-          due: Math.round(calcDue(adjustments) * 100) / 100,
-          updated: raw.updated,
-        };
-      }
-
       function toDB3(e) {
         return {
           id: e.id,
@@ -1912,25 +1789,22 @@
           mobile: e.mobile,
           due: e.due,
           notes: e.notes,
-          adjustments: e.adjustments,
           updated_date: e.updated,
         };
       }
       function fromDB3(row) {
-        return normalizeCustomer({
+        return {
           id: row.id,
           name: row.name,
           mobile: row.mobile,
-          due: row.due,
+          due: Number(row.due) || 0,
           notes: row.notes || "",
-          adjustments: row.adjustments,
           updated: row.updated_date,
-        });
+        };
       }
       function loadLocalEntries3() {
         try {
-          const list = JSON.parse(localStorage.getItem(STORE_KEY3)) || [];
-          return list.map(normalizeCustomer);
+          return JSON.parse(localStorage.getItem(STORE_KEY3)) || [];
         } catch (e) {
           return [];
         }
@@ -1974,15 +1848,6 @@
       }
 
       /* ---------- Customer Due: form + list ---------- */
-      function formatShortDate(iso) {
-        if (!iso) return "—";
-        const d = new Date(iso + "T00:00:00");
-        const day = String(d.getDate()).padStart(2, "0");
-        const month = d.toLocaleString("en-US", { month: "short" });
-        const year = String(d.getFullYear()).slice(-2);
-        return `${day}-${month}-${year}`;
-      }
-
       function clearCustomerError() {
         document.getElementById("custErr").style.display = "none";
       }
@@ -1993,9 +1858,7 @@
           "Add / Update Customer Due";
         document.getElementById("custName").value = "";
         document.getElementById("custMobile").value = "";
-        document.getElementById("custAdjType").value = "due";
-        document.getElementById("custAdjAmount").value = "";
-        document.getElementById("custAdjDate").value = todayISO();
+        document.getElementById("custDue").value = "";
         document.getElementById("custNotes").value = "";
         clearCustomerError();
       }
@@ -2003,12 +1866,8 @@
       async function saveCustomer() {
         const name = document.getElementById("custName").value.trim();
         const mobile = document.getElementById("custMobile").value.trim();
+        const due = parseFloat(document.getElementById("custDue").value) || 0;
         const notes = document.getElementById("custNotes").value.trim();
-        const adjType = document.getElementById("custAdjType").value;
-        const adjAmount =
-          parseFloat(document.getElementById("custAdjAmount").value) || 0;
-        const adjDate =
-          document.getElementById("custAdjDate").value || todayISO();
 
         if (!name || !mobile) {
           document.getElementById("custErr").style.display = "block";
@@ -2016,27 +1875,15 @@
         }
         clearCustomerError();
 
-        const id = "c_" + mobile.replace(/\s+/g, "");
-        const existing = customersCache.find((e) => e.id === id);
-        const adjustments = existing ? existing.adjustments.slice() : [];
-
-        if (adjAmount > 0) {
-          adjustments.push({
-            type: adjType,
-            amount: Math.round(adjAmount * 100) / 100,
-            date: adjDate,
-          });
-        }
-
-        const entry = normalizeCustomer({
+        const id = editingCustomerId || "c_" + mobile.replace(/\s+/g, "");
+        const entry = {
           id,
           name,
           mobile,
+          due: Math.round(due * 100) / 100,
           notes,
-          adjustments,
-          updated:
-            adjAmount > 0 ? adjDate : existing ? existing.updated : todayISO(),
-        });
+          updated: todayISO(),
+        };
 
         const local = loadLocalEntries3().filter((e) => e.id !== entry.id);
         local.push(entry);
@@ -2072,18 +1919,14 @@
           "Editing " + c.name;
         document.getElementById("custName").value = c.name;
         document.getElementById("custMobile").value = c.mobile;
-        document.getElementById("custAdjType").value = "due";
-        document.getElementById("custAdjAmount").value = "";
-        document.getElementById("custAdjDate").value = todayISO();
+        document.getElementById("custDue").value = c.due;
         document.getElementById("custNotes").value = c.notes || "";
         clearCustomerError();
-        document
-          .getElementById("custName")
-          .scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("custName").scrollIntoView({ behavior: "smooth", block: "center" });
       }
 
       async function deleteCustomer(id) {
-        if (!confirm("Delete this customer and their whole ledger?")) return;
+        if (!confirm("Delete this customer?")) return;
 
         const local = loadLocalEntries3().filter((e) => e.id !== id);
         saveLocalEntries3(local);
@@ -2102,31 +1945,6 @@
         if (editingCustomerId === id) resetCustomerForm();
         renderCustomers();
         showToast("Customer deleted");
-      }
-
-      async function deleteAdjustment(id, idx) {
-        if (!confirm("Delete this ledger entry?")) return;
-
-        const local = loadLocalEntries3();
-        const i = local.findIndex((e) => e.id === id);
-        if (i < 0) return;
-        local[i].adjustments.splice(idx, 1);
-        local[i] = normalizeCustomer(local[i]);
-        saveLocalEntries3(local);
-
-        if (isCloudConfigured()) {
-          try {
-            await cloudUpsertEntry3(local[i]);
-            updateSyncDot("ok");
-          } catch (err) {
-            updateSyncDot("error");
-            showToast("Deleted locally — cloud sync failed", true);
-            renderCustomers();
-            return;
-          }
-        }
-        renderCustomers();
-        showToast("Ledger entry deleted");
       }
 
       function toggleCustExpand(id) {
@@ -2157,10 +1975,7 @@
           .reduce((s, e) => s + e.due, 0)
           .toFixed(2);
 
-        const q = document
-          .getElementById("custSearch")
-          .value.trim()
-          .toLowerCase();
+        const q = document.getElementById("custSearch").value.trim().toLowerCase();
         let filtered = entries;
         if (q) {
           filtered = entries.filter(
@@ -2185,39 +2000,21 @@
       <td><button class="expandBtn" onclick="toggleCustExpand('${c.id}')">Details</button></td>
       <td class="rowActions">
         <button class="iconBtn" title="Edit" onclick="editCustomer('${c.id}')">✎</button>
+        <button class="iconBtn" title="Delete" onclick="deleteCustomer('${c.id}')">✕</button>
       </td>
     `;
-          // <button class="iconBtn" title="Delete" onclick="deleteCustomer('${c.id}')">✕</button>
           body.appendChild(tr);
-
-          const sortedAdj = c.adjustments
-            .map((a, idx) => ({ ...a, idx }))
-            .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
-
-          const ledgerHtml = sortedAdj
-            .map(
-              (a) => `
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:3px 0">
-        <span>${a.type === "paid" ? "Paid" : "Total Due"} - ${a.amount.toFixed(2)} &nbsp; Date: ${formatShortDate(a.date)}</span>
-        <button class="iconBtn" style="width:22px;height:22px;font-size:11px" title="Delete entry" onclick="deleteAdjustment('${c.id}', ${a.idx})">✕</button>
-      </div>`,
-            )
-            .join("");
 
           const exTr = document.createElement("tr");
           exTr.className = "expandRow";
           exTr.id = "custExpand_" + c.id;
           exTr.style.display = "none";
           exTr.innerHTML = `<td colspan="5">
-      <div style="display:flex; flex-direction:column">
-        <div style="font-weight:700">${c.name}</div>
-        <div style="color:var(--muted); font-size:13px; margin-bottom:6px">${c.mobile}</div>
-        ${ledgerHtml || '<div style="color:var(--muted); font-size:13px">No due/payment entries yet.</div>'}
-        ${c.notes ? `<div class="itemPill" style="margin-top:6px">Notes: ${c.notes}</div>` : ""}
-        <div style="border-top:1px solid var(--line); margin-top:8px; padding-top:8px; font-weight:700">
-          Current due - ${c.due.toFixed(2)}
-        </div>
-      </div>
+      <span class="itemPill">Name: ${c.name}</span>
+      <span class="itemPill">Mobile: ${c.mobile}</span>
+      <span class="itemPill">Due: ${c.due.toFixed(2)}</span>
+      ${c.notes ? `<span class="itemPill">Notes: ${c.notes}</span>` : ""}
+      <span class="itemPill">Last updated: ${formatDate(c.updated)}</span>
     </td>`;
           body.appendChild(exTr);
         });
@@ -2237,7 +2034,6 @@
       /* ---------- Init ---------- */
       resetForm();
       resetDayEndForm();
-      resetCustomerForm();
       updateSyncDot(isCloudConfigured() ? "ok" : "off");
     </script>
   </body>
