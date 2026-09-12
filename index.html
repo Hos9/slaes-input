@@ -2198,7 +2198,7 @@
             .map(
               (a) => `
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:3px 0">
-        <span>${a.type === "paid" ? "Paid" : "Total Due"} - ${a.amount.toFixed(2)} &nbsp; Date: ${formatShortDate(a.date)}</span>
+        <span>${a.type === "paid" ? "Paid" : "Due"} - ${a.amount.toFixed(2)} &nbsp; Date: ${formatShortDate(a.date)}</span>
       </div>`,
             )
             // <button class="iconBtn" style="width:22px;height:22px;font-size:11px" title="Delete entry" onclick="deleteAdjustment('${c.id}', ${a.idx})">✕</button>
