@@ -1825,8 +1825,8 @@
       <td>${e.sales.toFixed(2)}</td>
       <td><strong>${e.closing.toFixed(2)}</strong></td>
       <td>${e.paid.toFixed(2)}</td>
-      <td><button class="iconBtn" title="Delete" onclick="deleteDayEnd('${e.id}')">✕</button></td>
     `;
+          // <td><button class="iconBtn" title="Delete" onclick="deleteDayEnd('${e.id}')">✕</button></td>
           body.appendChild(tr);
         });
 
@@ -2199,9 +2199,9 @@
               (a) => `
       <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:3px 0">
         <span>${a.type === "paid" ? "Paid" : "Total Due"} - ${a.amount.toFixed(2)} &nbsp; Date: ${formatShortDate(a.date)}</span>
-        <button class="iconBtn" style="width:22px;height:22px;font-size:11px" title="Delete entry" onclick="deleteAdjustment('${c.id}', ${a.idx})">✕</button>
       </div>`,
             )
+            // <button class="iconBtn" style="width:22px;height:22px;font-size:11px" title="Delete entry" onclick="deleteAdjustment('${c.id}', ${a.idx})">✕</button>
             .join("");
 
           const exTr = document.createElement("tr");
