@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase Details — আরহাম জেনারেল স্টোর</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="purchase-details" data-navgroup="purchase">
+    <header>
+      <a
+        href="index.html"
+        class="brand"
+        style="text-decoration: none; color: inherit"
+      >
+        <span class="dot" id="syncDot"></span> আরহাম জেনারেল স্টোর
+        <span class="syncLabel" id="syncLabel">Local only</span>
+      </a>
+      <div class="headerRight">
+        <button
+          id="settingsBtn"
+          onclick="openSettings()"
+          title="Cloud database settings"
+        >
+          ⚙️
+        </button>
+        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <nav class="mainNav">
+      <a href="index.html" data-navgroup="home">হোম</a>
+      <a href="sales-input.html" data-navgroup="sales">বিক্রয়</a>
+      <a href="purchase-input.html" data-navgroup="purchase">ক্রয়</a>
+      <a href="customer-due.html" data-navgroup="customerdue">কাস্টমার বাকি</a>
+      <a href="day-end.html" data-navgroup="days">দিনের হিসাব</a>
+    </nav>
+
+    <nav class="subNav" id="subNav-sales" style="display: none">
+      <a href="sales-input.html" data-nav="sales-input">বিক্রয় তথ্য</a>
+      <a href="sales-details.html" data-nav="sales-details">বিক্রয় বিস্তারিত</a>
+    </nav>
+    <nav class="subNav" id="subNav-purchase" style="display: none">
+      <a href="purchase-input.html" data-nav="purchase-input">ক্রয় তথ্য</a>
+      <a href="purchase-details.html" data-nav="purchase-details"
+        >ক্রয় বিস্তারিত</a
+      >
+    </nav>
+    <nav class="subNav" id="subNav-days" style="display: none">
+      <a href="day-end.html" data-nav="day-end">দিনের তথ্য</a>
+      <a href="daily-details.html" data-nav="daily-details">দিনের বিস্তারিত</a>
+    </nav>
+
+    <main>
+      <div class="statGrid">
+        <div class="stat">
+          <div class="val" id="statCount">0</div>
+          <div class="lbl">তথ্য</div>
+        </div>
+        <div class="stat">
+          <div class="val" id="statTotal">0.00</div>
+          <div class="lbl">মোট ক্রয়</div>
+        </div>
+        <div class="stat">
+          <div class="val" id="statToday">0.00</div>
+          <div class="lbl">আজকের ক্রয়</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="detailsHead">
+          <h2 style="margin: 0">ক্রয় এর বিস্তারিত</h2>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <button
+              class="ghost"
+              style="padding: 8px 12px; font-size: 13px"
+              onclick="renderDetails()"
+            >
+              ↻ Refresh
+            </button>
+            <div class="search">
+              <input type="date" id="filterDate" onchange="renderDetails()" />
+            </div>
+          </div>
+        </div>
+        <div
+          id="filterTotalRow"
+          class="itemsTotalRow"
+          style="display: none; justify-content: space-between"
+        >
+          <span>মোট <strong id="filterTotalDate"></strong></span>
+          <span
+            ><strong id="filterTotalAmount">0.00</strong> (<span
+              id="filterTotalCount"
+              >0</span
+            >
+            তথ্য)</span
+          >
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>তারিখ</th>
+              <th>সময়</th>
+              <th>টাকা</th>
+              <th></th>
+              <th style="width: 70px"></th>
+            </tr>
+          </thead>
+          <tbody id="detailsBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty" style="display: none">
+          No purchase entries yet. Add one from Purchase Input.
+        </div>
+      </div>
+    </main>
+
+    <div class="modalBg" id="settingsModal">
+      <div class="modal">
+        <h3>Cloud Database (Supabase)</h3>
+        <div class="sub">
+          Connect this app to your free Supabase project so every page's data is
+          stored online and works across devices. Leave blank to keep everything
+          on this device only.
+        </div>
+        <div class="field">
+          <label>Project URL</label>
+          <input
+            type="text"
+            id="sbUrl"
+            text="https://tbboptkqgegrlugmcpgx.supabase.co"
+          />
+        </div>
+        <div class="field">
+          <label>Anon public key</label>
+          <input
+            type="text"
+            id="sbKey"
+            text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8"
+          />
+        </div>
+        <div class="statusLine" id="sbStatus"></div>
+        <div class="modalActions">
+          <button class="ghost" onclick="disconnectCloud()">Disconnect</button>
+          <div style="display: flex; gap: 8px">
+            <button class="ghost" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveCloudSettings()">
+              Save & Connect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="app.js"></script>
+    <script>
+      const STORE_KEY = "purchaseEntries";
+      const TABLE = "purchase_entries";
+
+      async function renderDetails() {
+        let entries;
+        if (isCloudConfigured()) {
+          try {
+            const rows = await cloudFetch(
+              TABLE,
+              "entry_date.desc,entry_time.desc",
+            );
+            entries = rows.map(fromDBEntry);
+            saveLocal(STORE_KEY, entries);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            entries = loadLocal(STORE_KEY);
+          }
+        } else {
+          updateSyncDot("off");
+          entries = loadLocal(STORE_KEY);
+        }
+
+        entries = entries
+          .slice()
+          .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+        const filterDate = document.getElementById("filterDate").value;
+        const filtered = filterDate
+          ? entries.filter((e) => e.date === filterDate)
+          : entries;
+
+        const filterTotalRow = document.getElementById("filterTotalRow");
+        if (filterDate) {
+          const sum = filtered.reduce((s, e) => s + e.total, 0);
+          document.getElementById("filterTotalDate").textContent =
+            formatDate(filterDate);
+          document.getElementById("filterTotalAmount").textContent =
+            sum.toFixed(2);
+          document.getElementById("filterTotalCount").textContent =
+            filtered.length;
+          filterTotalRow.style.display = "flex";
+        } else {
+          filterTotalRow.style.display = "none";
+        }
+
+        const body = document.getElementById("detailsBody");
+        body.innerHTML = "";
+        document.getElementById("emptyState").style.display = filtered.length
+          ? "none"
+          : "block";
+
+        filtered.forEach((e) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+      <td>${formatDate(e.date)}</td>
+      <td>${e.time || "—"}</td>
+      <td><strong>${e.total.toFixed(2)}</strong></td>
+      <td>${e.items && e.items.length ? `<button class="expandBtn" onclick="toggleExpand('${e.id}')">Items (${e.items.length})</button>` : ""}</td>
+      `;
+          // <td class="rowActions"><button class="iconBtn" title="Delete" onclick="deleteEntry('${e.id}')">✕</button></td>
+
+          body.appendChild(tr);
+
+          if (e.items && e.items.length) {
+            const exTr = document.createElement("tr");
+            exTr.className = "expandRow";
+            exTr.id = "expand_" + e.id;
+            exTr.style.display = "none";
+            exTr.innerHTML = `<td colspan="5">${e.items.map((it) => `<span class="itemPill">${it.name}${it.qty != null ? " · Qty " + it.qty : ""}${it.amount != null ? " · " + it.amount.toFixed(2) : ""}</span>`).join("")}</td>`;
+            body.appendChild(exTr);
+          }
+        });
+
+        document.getElementById("statCount").textContent = entries.length;
+        document.getElementById("statTotal").textContent = entries
+          .reduce((s, e) => s + e.total, 0)
+          .toFixed(2);
+        const todayStr = todayISO();
+        document.getElementById("statToday").textContent = entries
+          .filter((e) => e.date === todayStr)
+          .reduce((s, e) => s + e.total, 0)
+          .toFixed(2);
+      }
+
+      function toggleExpand(id) {
+        const row = document.getElementById("expand_" + id);
+        row.style.display = row.style.display === "none" ? "" : "none";
+      }
+
+      async function deleteEntry(id) {
+        if (!confirm("Delete this purchase entry?")) return;
+
+        const local = loadLocal(STORE_KEY).filter((e) => e.id !== id);
+        saveLocal(STORE_KEY, local);
+
+        if (isCloudConfigured()) {
+          try {
+            await cloudDelete(TABLE, id);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Deleted locally — cloud delete failed", true);
+            renderDetails();
+            return;
+          }
+        }
+        renderDetails();
+        showToast("Entry deleted");
+      }
+
+      function onCloudReconnect() {
+        renderDetails();
+      }
+
+      renderDetails();
+    </script>
+  </body>
+</html>

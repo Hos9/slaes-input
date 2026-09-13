@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day End — আরহাম জেনারেল স্টোর</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="day-end" data-navgroup="days">
+    <header>
+      <a
+        href="index.html"
+        class="brand"
+        style="text-decoration: none; color: inherit"
+      >
+        <span class="dot" id="syncDot"></span> আরহাম জেনারেল স্টোর
+        <span class="syncLabel" id="syncLabel">Local only</span>
+      </a>
+      <div class="headerRight">
+        <button
+          id="settingsBtn"
+          onclick="openSettings()"
+          title="Cloud database settings"
+        >
+          ⚙️
+        </button>
+        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <nav class="mainNav">
+      <a href="index.html" data-navgroup="home">হোম</a>
+      <a href="sales-input.html" data-navgroup="sales">বিক্রয়</a>
+      <a href="purchase-input.html" data-navgroup="purchase">ক্রয়</a>
+      <a href="customer-due.html" data-navgroup="customerdue">কাস্টমার বাকি</a>
+      <a href="day-end.html" data-navgroup="days">দিনের হিসাব</a>
+    </nav>
+
+    <nav class="subNav" id="subNav-sales" style="display: none">
+      <a href="sales-input.html" data-nav="sales-input">বিক্রয় তথ্য</a>
+      <a href="sales-details.html" data-nav="sales-details">বিক্রয় বিস্তারিত</a>
+    </nav>
+    <nav class="subNav" id="subNav-purchase" style="display: none">
+      <a href="purchase-input.html" data-nav="purchase-input">ক্রয় তথ্য</a>
+      <a href="purchase-details.html" data-nav="purchase-details"
+        >ক্রয় বিস্তারিত</a
+      >
+    </nav>
+    <nav class="subNav" id="subNav-days" style="display: none">
+      <a href="day-end.html" data-nav="day-end">দিনের তথ্য</a>
+      <a href="daily-details.html" data-nav="daily-details">দিনের বিস্তারিত</a>
+    </nav>
+
+    <main>
+      <div class="card">
+        <h2>দিন-সমাপ্তি এন্ট্রি</h2>
+        <div class="sub">
+          আজকের নগদ অবস্থার হিসাব রাখুন। তারিখ স্বয়ংক্রিয়ভাবে সেট করা হয় এবং
+          দিনের বিক্রয় ও ক্রয়ের বিবরণ থেকে বিক্রয়/ক্রয়ের তথ্য নিয়ে আসা হয়।
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>তারিখ</label>
+            <input type="text" id="dayEndDate" readonly />
+          </div>
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>পুর্বের জমা টাকা</label>
+            <input
+              type="number"
+              class="qtyAmt"
+              style="width: 100%"
+              id="openingCash"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+            />
+          </div>
+          <div class="field">
+            <label>বাসার থেকে নেওয়া</label>
+            <input
+              type="number"
+              class="qtyAmt"
+              style="width: 100%"
+              id="receivedFromHome"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>
+              আজকের মাল ক্রয়
+              <button
+                type="button"
+                class="iconBtn"
+                style="
+                  width: 20px;
+                  height: 20px;
+                  font-size: 11px;
+                  margin-left: 4px;
+                "
+                title="Refresh from Purchase Details"
+                onclick="refreshPurchaseTotal()"
+              >
+                ↻
+              </button>
+            </label>
+            <input
+              type="text"
+              class="qtyAmt"
+              style="width: 100%"
+              id="dayEndPurchase"
+              readonly
+            />
+          </div>
+          <div class="field">
+            <label>
+              আজকের মাল বিক্রয়
+              <button
+                type="button"
+                class="iconBtn"
+                style="
+                  width: 20px;
+                  height: 20px;
+                  font-size: 11px;
+                  margin-left: 4px;
+                "
+                title="Refresh from বিক্রয় বিস্তারিত"
+                onclick="refreshSalesTotal()"
+              >
+                ↻
+              </button>
+            </label>
+            <input
+              type="text"
+              class="qtyAmt"
+              style="width: 100%"
+              id="dayEndSales"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="totalBox">
+          <div>
+            <label for="closingCash">আজকের ক্যাশে জমা</label>
+            <div class="hint">গণনা করা প্রকৃত নগদ অর্থের পরিমাণ লিখুন।</div>
+          </div>
+          <div>
+            <input
+              type="number"
+              id="closingCash"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="itemsTotalRow" style="justify-content: space-between">
+          <span
+            >প্রত্যাশিত: প্রারম্ভিক + প্রাপ্ত − ক্রয় + বিক্রয় − সমাপনী =
+            <strong id="paidToHomeDisplay">0.00</strong> (বাসায় জমা দেওয়া)</span
+          >
+        </div>
+
+        <div class="actions">
+          <button class="ghost" onclick="resetDayEndForm()">Clear</button>
+          <button class="primary" id="dayEndSaveBtn" onclick="saveDayEnd()">
+            Save Entry
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <div class="modalBg" id="settingsModal">
+      <div class="modal">
+        <h3>Cloud Database (Supabase)</h3>
+        <div class="sub">
+          Connect this app to your free Supabase project so every page's data is
+          stored online and works across devices. Leave blank to keep everything
+          on this device only.
+        </div>
+        <div class="field">
+          <label>Project URL</label>
+          <input
+            type="text"
+            id="sbUrl"
+            text="https://tbboptkqgegrlugmcpgx.supabase.co"
+          />
+        </div>
+        <div class="field">
+          <label>Anon public key</label>
+          <input
+            type="text"
+            id="sbKey"
+            text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8"
+          />
+        </div>
+        <div class="statusLine" id="sbStatus"></div>
+        <div class="modalActions">
+          <button class="ghost" onclick="disconnectCloud()">Disconnect</button>
+          <div style="display: flex; gap: 8px">
+            <button class="ghost" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveCloudSettings()">
+              Save & Connect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="app.js"></script>
+    <script>
+      const STORE_KEY2 = "dayEndEntries";
+      const TABLE2 = "day_end_entries";
+
+      function toDB2(e) {
+        return {
+          id: e.id,
+          entry_date: e.date,
+          opening_cash: e.opening,
+          received_from_home: e.received,
+          todays_purchase: e.purchase,
+          sales: e.sales,
+          closing_cash: e.closing,
+          paid_to_home: e.paid,
+        };
+      }
+
+      function recalcPaidToHome() {
+        const opening =
+          parseFloat(document.getElementById("openingCash").value) || 0;
+        const received =
+          parseFloat(document.getElementById("receivedFromHome").value) || 0;
+        const purchase =
+          parseFloat(document.getElementById("dayEndPurchase").dataset.value) ||
+          0;
+        const sales =
+          parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
+        const closing =
+          parseFloat(document.getElementById("closingCash").value) || 0;
+        const paid = opening + received - purchase + sales - closing;
+        document.getElementById("paidToHomeDisplay").textContent =
+          paid.toFixed(2);
+        return paid;
+      }
+
+      async function refreshSalesTotal() {
+        const iso =
+          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const field = document.getElementById("dayEndSales");
+        field.value = "Loading...";
+        const sum = await sumEntriesForDate(
+          "salesEntries",
+          "sales_entries",
+          iso,
+        );
+        field.dataset.value = sum;
+        field.value = sum.toFixed(2);
+        recalcPaidToHome();
+      }
+
+      async function refreshPurchaseTotal() {
+        const iso =
+          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const field = document.getElementById("dayEndPurchase");
+        field.value = "Loading...";
+        const sum = await sumEntriesForDate(
+          "purchaseEntries",
+          "purchase_entries",
+          iso,
+        );
+        field.dataset.value = sum;
+        field.value = sum.toFixed(2);
+        recalcPaidToHome();
+      }
+
+      async function resetDayEndForm() {
+        const iso = todayISO();
+        const dateInput = document.getElementById("dayEndDate");
+        dateInput.value = formatDate(iso);
+        dateInput.dataset.iso = iso;
+
+        document.getElementById("receivedFromHome").value = "";
+        document.getElementById("closingCash").value = "";
+
+        const local = loadLocal(STORE_KEY2)
+          .slice()
+          .sort((a, b) => b.date.localeCompare(a.date));
+        const mostRecent = local.find((e) => e.date !== iso);
+        document.getElementById("openingCash").value = mostRecent
+          ? mostRecent.closing
+          : "";
+
+        await Promise.all([refreshSalesTotal(), refreshPurchaseTotal()]);
+      }
+
+      ["openingCash", "receivedFromHome", "closingCash"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", recalcPaidToHome);
+      });
+
+      async function saveDayEnd() {
+        const iso =
+          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const paid = recalcPaidToHome();
+        const entry = {
+          id: "d_" + iso,
+          date: iso,
+          opening:
+            parseFloat(document.getElementById("openingCash").value) || 0,
+          received:
+            parseFloat(document.getElementById("receivedFromHome").value) || 0,
+          purchase:
+            parseFloat(
+              document.getElementById("dayEndPurchase").dataset.value,
+            ) || 0,
+          sales:
+            parseFloat(document.getElementById("dayEndSales").dataset.value) ||
+            0,
+          closing:
+            parseFloat(document.getElementById("closingCash").value) || 0,
+          paid: Math.round(paid * 100) / 100,
+        };
+
+        const local = loadLocal(STORE_KEY2).filter((e) => e.id !== entry.id);
+        local.push(entry);
+        saveLocal(STORE_KEY2, local);
+
+        const btn = document.getElementById("dayEndSaveBtn");
+        if (isCloudConfigured()) {
+          btn.textContent = "Saving...";
+          btn.disabled = true;
+          try {
+            await cloudUpsert(TABLE2, toDB2(entry));
+            updateSyncDot("ok");
+            showToast("Day end entry saved to cloud");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Saved locally — cloud sync failed", true);
+          }
+          btn.textContent = "Save Entry";
+          btn.disabled = false;
+        } else {
+          showToast("Day end entry saved");
+        }
+
+        resetDayEndForm();
+      }
+
+      function onCloudReconnect() {
+        resetDayEndForm();
+      }
+
+      resetDayEndForm();
+    </script>
+  </body>
+</html>

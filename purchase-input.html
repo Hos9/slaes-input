@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase Input — আরহাম জেনারেল স্টোর</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="purchase-input" data-navgroup="purchase">
+    <header>
+      <a
+        href="index.html"
+        class="brand"
+        style="text-decoration: none; color: inherit"
+      >
+        <span class="dot" id="syncDot"></span> আরহাম জেনারেল স্টোর
+        <span class="syncLabel" id="syncLabel">Local only</span>
+      </a>
+      <div class="headerRight">
+        <button
+          id="settingsBtn"
+          onclick="openSettings()"
+          title="Cloud database settings"
+        >
+          ⚙️
+        </button>
+        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <nav class="mainNav">
+      <a href="index.html" data-navgroup="home">হোম</a>
+      <a href="sales-input.html" data-navgroup="sales">বিক্রয়</a>
+      <a href="purchase-input.html" data-navgroup="purchase">ক্রয়</a>
+      <a href="customer-due.html" data-navgroup="customerdue">কাস্টমার বাকি</a>
+      <a href="day-end.html" data-navgroup="days">দিনের হিসাব</a>
+    </nav>
+
+    <nav class="subNav" id="subNav-sales" style="display: none">
+      <a href="sales-input.html" data-nav="sales-input">বিক্রয় তথ্য</a>
+      <a href="sales-details.html" data-nav="sales-details">বিক্রয় বিস্তারিত</a>
+    </nav>
+    <nav class="subNav" id="subNav-purchase" style="display: none">
+      <a href="purchase-input.html" data-nav="purchase-input">ক্রয় তথ্য</a>
+      <a href="purchase-details.html" data-nav="purchase-details"
+        >ক্রয় বিস্তারিত</a
+      >
+    </nav>
+    <nav class="subNav" id="subNav-days" style="display: none">
+      <a href="day-end.html" data-nav="day-end">দিনের তথ্য</a>
+      <a href="daily-details.html" data-nav="daily-details">দিনের বিস্তারিত</a>
+    </nav>
+
+    <main>
+      <div class="card">
+        <h2 style="color: red">নতুন ক্রয় তথ্য</h2>
+        <div class="sub" style="color: red">
+          প্রযোজ্য ক্যাটাগরিগুলোতে টিক দিন। প্রতি আইটেমের পরিমাণ (Qty) ও মূল্য
+          ঐচ্ছিক—তবে তথ্যটি সংরক্ষণ করার জন্য নিচের 'মোট' (Total) অংশটি পূরণ করা
+          আবশ্যক।
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>তারিখ</label>
+            <input type="date" id="entryDate" />
+          </div>
+          <div class="field">
+            <label>সময়</label>
+            <input type="time" id="entryTime" />
+          </div>
+        </div>
+
+        <div class="totalBox">
+          <div>
+            <label for="totalAmount" style="color: red"
+              >মোট ক্রয় এর পরিমান *</label
+            >
+            <div class="hint" style="color: red">
+              উপরের টাকার অঙ্ক থেকে স্বয়ংক্রিয়ভাবে পূরণ করা হয়েছে —
+              <p>যেকোনো সময় এটি পরিবর্তন করা যাবে। এটি সংরক্ষণ করা আবশ্যক।</p>
+            </div>
+          </div>
+          <div>
+            <input
+              type="number"
+              id="totalAmount"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="errMsg" id="totalErr">
+          মোট ক্রয়মূল্য প্রয়োজন এবং তা অবশ্যই এর চেয়ে বেশি হতে হবে। 0.
+        </div>
+
+        <div class="actions">
+          <button class="ghost" onclick="resetForm()">Clear</button>
+          <button class="primary" id="saveBtn" onclick="saveEntry()">
+            Save Entry
+          </button>
+        </div>
+
+        <div class="itemsTotalRow">
+          এ পর্যন্ত প্রবেশ করানো আইটেমের সংখ্যা:
+          <strong id="itemsSum">0.00</strong>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px"></th>
+              <th>Item</th>
+              <th style="width: 100px">Qty</th>
+              <th style="width: 110px">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+        <!-- <div class="itemsTotalRow">Items amount entered so far: <strong id="itemsSum">0.00</strong></div>
+
+  <div class="totalBox">
+    <div>
+      <label for="totalAmount">Total Purchase Amount *</label>
+      <div class="hint">Auto-filled from the amounts above — edit it any time. Required to save.</div>
+    </div>
+    <div>
+      <input type="number" id="totalAmount" placeholder="0.00" step="0.01" min="0">
+    </div>
+  </div>
+  <div class="errMsg" id="totalErr">Total Purchase Amount is required and must be greater than 0.</div>
+
+  <div class="actions">
+    <button class="ghost" onclick="resetForm()">Clear</button>
+    <button class="primary" id="saveBtn" onclick="saveEntry()">Save Entry</button>
+  </div> -->
+      </div>
+    </main>
+
+    <div class="modalBg" id="settingsModal">
+      <div class="modal">
+        <h3>Cloud Database (Supabase)</h3>
+        <div class="sub">
+          Connect this app to your free Supabase project so every page's data is
+          stored online and works across devices. Leave blank to keep everything
+          on this device only.
+        </div>
+        <div class="field">
+          <label>Project URL</label>
+          <input
+            type="text"
+            id="sbUrl"
+            text="https://tbboptkqgegrlugmcpgx.supabase.co"
+          />
+        </div>
+        <div class="field">
+          <label>Anon public key</label>
+          <input
+            type="text"
+            id="sbKey"
+            text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8"
+          />
+        </div>
+        <div class="statusLine" id="sbStatus"></div>
+        <div class="modalActions">
+          <button class="ghost" onclick="disconnectCloud()">Disconnect</button>
+          <div style="display: flex; gap: 8px">
+            <button class="ghost" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveCloudSettings()">
+              Save & Connect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="app.js"></script>
+    <script>
+      const STORE_KEY = "purchaseEntries";
+      const TABLE = "purchase_entries";
+
+      function buildItemsTable() {
+        const body = document.getElementById("itemsBody");
+        body.innerHTML = "";
+        CATEGORIES.forEach((name, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+      <td><input type="checkbox" data-idx="${i}" class="chkItem"></td>
+      <td class="itemName">${name}</td>
+      <td><input type="number" class="qtyAmt qtyInput" data-idx="${i}" min="0" placeholder="—"></td>
+      <td><input type="number" class="qtyAmt amtInput" data-idx="${i}" min="0" step="0.01" placeholder="—"></td>
+    `;
+          body.appendChild(tr);
+        });
+        body
+          .querySelectorAll(".amtInput")
+          .forEach((inp) => inp.addEventListener("input", onAmountEdit));
+        body
+          .querySelectorAll(".qtyInput, .amtInput")
+          .forEach((inp) => inp.addEventListener("input", autoCheck));
+      }
+
+      function autoCheck(e) {
+        const idx = e.target.dataset.idx;
+        const qty = document.querySelector(
+          `.qtyInput[data-idx="${idx}"]`,
+        ).value;
+        const amt = document.querySelector(
+          `.amtInput[data-idx="${idx}"]`,
+        ).value;
+        const chk = document.querySelector(`.chkItem[data-idx="${idx}"]`);
+        if (qty !== "" || amt !== "") chk.checked = true;
+      }
+
+      let totalManuallyEdited = false;
+
+      function onAmountEdit() {
+        recalcItemsSum();
+        if (!totalManuallyEdited) {
+          document.getElementById("totalAmount").value =
+            document.getElementById("itemsSum").textContent;
+        }
+      }
+
+      function recalcItemsSum() {
+        let sum = 0;
+        document.querySelectorAll(".amtInput").forEach((inp) => {
+          const v = parseFloat(inp.value);
+          if (!isNaN(v)) sum += v;
+        });
+        document.getElementById("itemsSum").textContent = sum.toFixed(2);
+        return sum;
+      }
+
+      document.getElementById("totalAmount").addEventListener("input", () => {
+        totalManuallyEdited = true;
+        clearTotalError();
+      });
+
+      function clearTotalError() {
+        document.getElementById("totalAmount").classList.remove("err");
+        document.getElementById("totalErr").style.display = "none";
+      }
+
+      function setDefaultDateTime() {
+        const now = new Date();
+        document.getElementById("entryDate").value = now
+          .toISOString()
+          .slice(0, 10);
+        document.getElementById("entryTime").value = now
+          .toTimeString()
+          .slice(0, 5);
+      }
+
+      function resetForm() {
+        buildItemsTable();
+        setDefaultDateTime();
+        document.getElementById("totalAmount").value = "";
+        totalManuallyEdited = false;
+        recalcItemsSum();
+        clearTotalError();
+      }
+
+      async function saveEntry() {
+        const totalInput = document.getElementById("totalAmount");
+        const total = parseFloat(totalInput.value);
+
+        if (isNaN(total) || total <= 0) {
+          totalInput.classList.add("err");
+          document.getElementById("totalErr").style.display = "block";
+          totalInput.focus();
+          return;
+        }
+
+        const items = [];
+        CATEGORIES.forEach((name, i) => {
+          const checked = document.querySelector(
+            `.chkItem[data-idx="${i}"]`,
+          ).checked;
+          const qtyVal = document.querySelector(
+            `.qtyInput[data-idx="${i}"]`,
+          ).value;
+          const amtVal = document.querySelector(
+            `.amtInput[data-idx="${i}"]`,
+          ).value;
+          if (checked || qtyVal !== "" || amtVal !== "") {
+            items.push({
+              name,
+              qty: qtyVal === "" ? null : Number(qtyVal),
+              amount: amtVal === "" ? null : Number(amtVal),
+            });
+          }
+        });
+
+        const date = document.getElementById("entryDate").value;
+        const time = document.getElementById("entryTime").value;
+
+        const entry = {
+          id: "e_" + Date.now(),
+          date,
+          time,
+          total: Math.round(total * 100) / 100,
+          items,
+        };
+
+        const local = loadLocal(STORE_KEY);
+        local.push(entry);
+        saveLocal(STORE_KEY, local);
+
+        const saveBtn = document.getElementById("saveBtn");
+        if (isCloudConfigured()) {
+          saveBtn.textContent = "Saving...";
+          saveBtn.disabled = true;
+          try {
+            await cloudUpsert(TABLE, toDBEntry(entry));
+            updateSyncDot("ok");
+            showToast("Purchase entry saved to cloud");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Saved locally — cloud sync failed", true);
+          }
+          saveBtn.textContent = "Save Entry";
+          saveBtn.disabled = false;
+        } else {
+          showToast("Purchase entry saved");
+        }
+
+        resetForm();
+      }
+
+      function onCloudReconnect() {
+        /* nothing to refresh on this page */
+      }
+
+      resetForm();
+      updateSyncDot(isCloudConfigured() ? "ok" : "off");
+    </script>
+  </body>
+</html>

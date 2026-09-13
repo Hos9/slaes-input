@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Due — আরহাম জেনারেল স্টোর</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="customerdue" data-navgroup="customerdue">
+    <header>
+      <a
+        href="index.html"
+        class="brand"
+        style="text-decoration: none; color: inherit"
+      >
+        <span class="dot" id="syncDot"></span> আরহাম জেনারেল স্টোর
+        <span class="syncLabel" id="syncLabel">Local only</span>
+      </a>
+      <div class="headerRight">
+        <button
+          id="settingsBtn"
+          onclick="openSettings()"
+          title="Cloud database settings"
+        >
+          ⚙️
+        </button>
+        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <nav class="mainNav">
+      <a href="index.html" data-navgroup="home">হোম</a>
+      <a href="sales-input.html" data-navgroup="sales">বিক্রয়</a>
+      <a href="purchase-input.html" data-navgroup="purchase">ক্রয়</a>
+      <a href="customer-due.html" data-navgroup="customerdue">কাস্টমার বাকি</a>
+      <a href="day-end.html" data-navgroup="days">দিনের হিসাব</a>
+    </nav>
+
+    <nav class="subNav" id="subNav-sales" style="display: none">
+      <a href="sales-input.html" data-nav="sales-input">বিক্রয় তথ্য</a>
+      <a href="sales-details.html" data-nav="sales-details">বিক্রয় বিস্তারিত</a>
+    </nav>
+    <nav class="subNav" id="subNav-purchase" style="display: none">
+      <a href="purchase-input.html" data-nav="purchase-input">ক্রয় তথ্য</a>
+      <a href="purchase-details.html" data-nav="purchase-details"
+        >ক্রয় বিস্তারিত</a
+      >
+    </nav>
+    <nav class="subNav" id="subNav-days" style="display: none">
+      <a href="day-end.html" data-nav="day-end">দিনের তথ্য</a>
+      <a href="daily-details.html" data-nav="daily-details">দিনের বিস্তারিত</a>
+    </nav>
+
+    <main>
+      <div class="statGrid">
+        <div class="stat">
+          <div class="val" id="custCount">0</div>
+          <div class="lbl">কাস্টমার সংখ্যা</div>
+        </div>
+        <div class="stat">
+          <div class="val" id="custTotalDue">0.00</div>
+          <div class="lbl">মোট বাকি</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 id="custFormTitle">গ্রাহকের বকেয়া যোগ/হালনাগাদ করুন</h2>
+        <div class="sub">
+          গ্রাহককে খুঁজে পেতে বা নতুন করে যুক্ত করতে তাঁর মোবাইল নম্বরটি লিখুন
+          এবং এরপর চাইলে বকেয়া বা পেমেন্ট অ্যাডজাস্টমেন্টের তথ্য নথিভুক্ত করুন।
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>কাস্টমার নাম</label
+            ><input
+              type="text"
+              id="custName"
+              placeholder="e.g. Karim Hossain"
+            />
+          </div>
+          <div class="field">
+            <label>মোবাইল নাম্বার</label
+            ><input
+              type="text"
+              id="custMobile"
+              placeholder="e.g. 01712345678"
+            />
+          </div>
+        </div>
+
+        <div class="sub" style="margin-top: 4px">
+          একটি বকেয়া সমন্বয় যোগ করুন (ঐচ্ছিক — শুধুমাত্র নাম বা নোট সংরক্ষণ করতে
+          চাইলে টাকার পরিমাণ ফাঁকা রাখুন)।
+        </div>
+        <div class="rowTop">
+          <div class="field">
+            <label>Type</label>
+            <select id="custAdjType">
+              <option value="due">বাকির পরিমান</option>
+              <option value="paid">নগদ পরিশোধ</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>টাকার পরিমান</label
+            ><input
+              type="number"
+              id="custAdjAmount"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+            />
+          </div>
+          <div class="field">
+            <label>তারিখ</label><input type="date" id="custAdjDate" />
+          </div>
+        </div>
+
+        <div class="rowTop">
+          <div class="field">
+            <label>মন্তব্য</label
+            ><input
+              type="text"
+              id="custNotes"
+              placeholder="e.g. pays every Friday"
+            />
+          </div>
+        </div>
+
+        <div class="errMsg" id="custErr">
+          কাস্টমার নাম এবং মোবাইল নাম্বার দেওয়া বাধ্যতামূলক!!
+        </div>
+
+        <div class="actions">
+          <button class="ghost" onclick="resetCustomerForm()">Clear</button>
+          <button class="primary" id="custSaveBtn" onclick="saveCustomer()">
+            Save Customer
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="detailsHead">
+          <h2 style="margin: 0">কাস্টমার বাকির লিস্ট</h2>
+          <div class="search">
+            <input
+              type="text"
+              id="custSearch"
+              placeholder="Search name or mobile"
+              oninput="renderCustomers()"
+              style="width: 220px"
+            />
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>পরিবর্তন</th>
+              <th>নাম</th>
+              <th>মোবাইল</th>
+              <th>বাকি</th>
+              <th style="width: auto"></th>
+            </tr>
+          </thead>
+          <tbody id="customerBody"></tbody>
+        </table>
+        <div id="customerEmptyState" class="empty" style="display: none">
+          No customers yet. Add one above.
+        </div>
+      </div>
+    </main>
+
+    <div class="modalBg" id="settingsModal">
+      <div class="modal">
+        <h3>Cloud Database (Supabase)</h3>
+        <div class="sub">
+          Connect this app to your free Supabase project so every page's data is
+          stored online and works across devices. Leave blank to keep everything
+          on this device only.
+        </div>
+        <div class="field">
+          <label>Project URL</label>
+          <input
+            type="text"
+            id="sbUrl"
+            text="https://tbboptkqgegrlugmcpgx.supabase.co"
+          />
+        </div>
+        <div class="field">
+          <label>Anon public key</label>
+          <input
+            type="text"
+            id="sbKey"
+            text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8"
+          />
+        </div>
+        <div class="statusLine" id="sbStatus"></div>
+        <div class="modalActions">
+          <button class="ghost" onclick="disconnectCloud()">Disconnect</button>
+          <div style="display: flex; gap: 8px">
+            <button class="ghost" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveCloudSettings()">
+              Save & Connect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="app.js"></script>
+    <script>
+      const STORE_KEY3 = "customerDues";
+      const TABLE3 = "customer_dues";
+      let customersCache = [];
+      let editingCustomerId = null;
+
+      function calcDue(adjustments) {
+        return adjustments.reduce(
+          (s, a) => s + (a.type === "paid" ? -a.amount : a.amount),
+          0,
+        );
+      }
+
+      function normalizeCustomer(raw) {
+        let adjustments = Array.isArray(raw.adjustments) ? raw.adjustments : [];
+        if (!adjustments.length && raw.due) {
+          adjustments = [
+            {
+              type: "due",
+              amount: Number(raw.due) || 0,
+              date: raw.updated || todayISO(),
+            },
+          ];
+        }
+        return {
+          id: raw.id,
+          name: raw.name,
+          mobile: raw.mobile,
+          notes: raw.notes || "",
+          adjustments,
+          due: Math.round(calcDue(adjustments) * 100) / 100,
+          updated: raw.updated,
+        };
+      }
+
+      function toDB3(e) {
+        return {
+          id: e.id,
+          name: e.name,
+          mobile: e.mobile,
+          due: e.due,
+          notes: e.notes,
+          adjustments: e.adjustments,
+          updated_date: e.updated,
+        };
+      }
+      function fromDB3(row) {
+        return normalizeCustomer({
+          id: row.id,
+          name: row.name,
+          mobile: row.mobile,
+          due: row.due,
+          notes: row.notes || "",
+          adjustments: row.adjustments,
+          updated: row.updated_date,
+        });
+      }
+
+      function loadCustomersLocal() {
+        return loadLocal(STORE_KEY3).map(normalizeCustomer);
+      }
+
+      function formatShort(iso) {
+        return formatShortDate(iso);
+      }
+
+      function clearCustomerError() {
+        document.getElementById("custErr").style.display = "none";
+      }
+
+      function resetCustomerForm() {
+        editingCustomerId = null;
+        document.getElementById("custFormTitle").textContent =
+          "গ্রাহকের বকেয়া যোগ/হালনাগাদ করুন";
+        document.getElementById("custName").value = "";
+        document.getElementById("custMobile").value = "";
+        document.getElementById("custAdjType").value = "due";
+        document.getElementById("custAdjAmount").value = "";
+        document.getElementById("custAdjDate").value = todayISO();
+        document.getElementById("custNotes").value = "";
+        clearCustomerError();
+      }
+
+      async function saveCustomer() {
+        const name = document.getElementById("custName").value.trim();
+        const mobile = document.getElementById("custMobile").value.trim();
+        const notes = document.getElementById("custNotes").value.trim();
+        const adjType = document.getElementById("custAdjType").value;
+        const adjAmount =
+          parseFloat(document.getElementById("custAdjAmount").value) || 0;
+        const adjDate =
+          document.getElementById("custAdjDate").value || todayISO();
+
+        if (!name || !mobile) {
+          document.getElementById("custErr").style.display = "block";
+          return;
+        }
+        clearCustomerError();
+
+        const id = "c_" + mobile.replace(/\s+/g, "");
+        const existing = customersCache.find((e) => e.id === id);
+        const adjustments = existing ? existing.adjustments.slice() : [];
+
+        if (adjAmount > 0) {
+          adjustments.push({
+            type: adjType,
+            amount: Math.round(adjAmount * 100) / 100,
+            date: adjDate,
+          });
+        }
+
+        const entry = normalizeCustomer({
+          id,
+          name,
+          mobile,
+          notes,
+          adjustments,
+          updated:
+            adjAmount > 0 ? adjDate : existing ? existing.updated : todayISO(),
+        });
+
+        const local = loadLocal(STORE_KEY3).filter((e) => e.id !== entry.id);
+        local.push(entry);
+        saveLocal(STORE_KEY3, local);
+
+        const btn = document.getElementById("custSaveBtn");
+        if (isCloudConfigured()) {
+          btn.textContent = "Saving...";
+          btn.disabled = true;
+          try {
+            await cloudUpsert(TABLE3, toDB3(entry));
+            updateSyncDot("ok");
+            showToast("Customer saved to cloud");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Saved locally — cloud sync failed", true);
+          }
+          btn.textContent = "Save Customer";
+          btn.disabled = false;
+        } else {
+          showToast("Customer saved");
+        }
+
+        resetCustomerForm();
+        renderCustomers();
+      }
+
+      function editCustomer(id) {
+        const c = customersCache.find((e) => e.id === id);
+        if (!c) return;
+        editingCustomerId = c.id;
+        document.getElementById("custFormTitle").textContent =
+          "Editing " + c.name;
+        document.getElementById("custName").value = c.name;
+        document.getElementById("custMobile").value = c.mobile;
+        document.getElementById("custAdjType").value = "due";
+        document.getElementById("custAdjAmount").value = "";
+        document.getElementById("custAdjDate").value = todayISO();
+        document.getElementById("custNotes").value = c.notes || "";
+        clearCustomerError();
+        document
+          .getElementById("custName")
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      async function deleteCustomer(id) {
+        if (!confirm("Delete this customer and their whole ledger?")) return;
+
+        const local = loadLocal(STORE_KEY3).filter((e) => e.id !== id);
+        saveLocal(STORE_KEY3, local);
+
+        if (isCloudConfigured()) {
+          try {
+            await cloudDelete(TABLE3, id);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Deleted locally — cloud delete failed", true);
+            renderCustomers();
+            return;
+          }
+        }
+        if (editingCustomerId === id) resetCustomerForm();
+        renderCustomers();
+        showToast("Customer deleted");
+      }
+
+      async function deleteAdjustment(id, idx) {
+        if (!confirm("Delete this ledger entry?")) return;
+
+        const local = loadLocal(STORE_KEY3);
+        const i = local.findIndex((e) => e.id === id);
+        if (i < 0) return;
+        local[i].adjustments.splice(idx, 1);
+        local[i] = normalizeCustomer(local[i]);
+        saveLocal(STORE_KEY3, local);
+
+        if (isCloudConfigured()) {
+          try {
+            await cloudUpsert(TABLE3, toDB3(local[i]));
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Deleted locally — cloud sync failed", true);
+            renderCustomers();
+            return;
+          }
+        }
+        renderCustomers();
+        showToast("Ledger entry deleted");
+      }
+
+      function toggleCustExpand(id) {
+        const row = document.getElementById("custExpand_" + id);
+        row.style.display = row.style.display === "none" ? "" : "none";
+      }
+
+      async function renderCustomers() {
+        let entries;
+        if (isCloudConfigured()) {
+          try {
+            const rows = await cloudFetch(TABLE3);
+            entries = rows.map(fromDB3);
+            saveLocal(STORE_KEY3, entries);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            entries = loadCustomersLocal();
+          }
+        } else {
+          updateSyncDot("off");
+          entries = loadCustomersLocal();
+        }
+
+        customersCache = entries;
+
+        document.getElementById("custCount").textContent = entries.length;
+        document.getElementById("custTotalDue").textContent = entries
+          .reduce((s, e) => s + e.due, 0)
+          .toFixed(2);
+
+        const q = document
+          .getElementById("custSearch")
+          .value.trim()
+          .toLowerCase();
+        let filtered = entries;
+        if (q) {
+          filtered = entries.filter(
+            (e) =>
+              e.name.toLowerCase().includes(q) ||
+              e.mobile.toLowerCase().includes(q),
+          );
+        }
+        filtered = filtered.slice().sort((a, b) => b.due - a.due);
+
+        const body = document.getElementById("customerBody");
+        body.innerHTML = "";
+        document.getElementById("customerEmptyState").style.display =
+          filtered.length ? "none" : "block";
+
+        filtered.forEach((c) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td class="rowActions">
+            <button class="iconBtn" title="Edit" onclick="editCustomer('${c.id}')">✎</button>
+          </td>
+          <td>${c.name}</td>
+          <td>${c.mobile}</td>
+          <td><strong>${c.due.toFixed(2)}</strong></td>
+          <td><button class="expandBtn" onclick="toggleCustExpand('${c.id}')">Details</button></td>
+    `;
+          // <button class="iconBtn" title="Delete" onclick="deleteCustomer('${c.id}')">✕</button>
+          body.appendChild(tr);
+
+          const sortedAdj = c.adjustments
+            .map((a, idx) => ({ ...a, idx }))
+            .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+          const ledgerHtml = sortedAdj
+            .map(
+              (a) => `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:3px 0">
+        <span>${a.type === "paid" ? "Paid" : "Due"} - ${a.amount.toFixed(2)} &nbsp; তারিখ: ${formatShort(a.date)}</span>
+        
+      </div>`,
+            )
+            // <button class="iconBtn" style="width:22px;height:22px;font-size:11px" title="Delete entry" onclick="deleteAdjustment('${c.id}', ${a.idx})">✕</button>
+            .join("");
+
+          const exTr = document.createElement("tr");
+          exTr.className = "expandRow";
+          exTr.id = "custExpand_" + c.id;
+          exTr.style.display = "none";
+          exTr.innerHTML = `<td colspan="5">
+      <div style="display:flex; flex-direction:column">
+        <div style="font-weight:700">${c.name}</div>
+        <div style="color:var(--muted); font-size:13px; margin-bottom:6px">${c.mobile}</div>
+        ${ledgerHtml || '<div style="color:var(--muted); font-size:13px">No due/payment entries yet.</div>'}
+        ${c.notes ? `<div class="itemPill" style="margin-top:6px">Notes: ${c.notes}</div>` : ""}
+        <div style="border-top:1px solid var(--line); margin-top:8px; padding-top:8px; font-weight:700">
+          বর্তমান বাকি - ${c.due.toFixed(2)}
+        </div>
+      </div>
+    </td>`;
+          body.appendChild(exTr);
+        });
+      }
+
+      function onCloudReconnect() {
+        renderCustomers();
+      }
+
+      resetCustomerForm();
+      renderCustomers();
+    </script>
+  </body>
+</html>

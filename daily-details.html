@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Details — আরহাম জেনারেল স্টোর</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-page="daily-details" data-navgroup="days">
+    <header>
+      <a
+        href="index.html"
+        class="brand"
+        style="text-decoration: none; color: inherit"
+      >
+        <span class="dot" id="syncDot"></span> আরহাম জেনারেল স্টোর
+        <span class="syncLabel" id="syncLabel">Local only</span>
+      </a>
+      <div class="headerRight">
+        <button
+          id="settingsBtn"
+          onclick="openSettings()"
+          title="Cloud database settings"
+        >
+          ⚙️
+        </button>
+        <button id="themeBtn" onclick="toggleTheme()">🌙</button>
+      </div>
+    </header>
+
+    <nav class="mainNav">
+      <a href="index.html" data-navgroup="home">হোম</a>
+      <a href="sales-input.html" data-navgroup="sales">বিক্রয়</a>
+      <a href="purchase-input.html" data-navgroup="purchase">ক্রয়</a>
+      <a href="customer-due.html" data-navgroup="customerdue">কাস্টমার বাকি</a>
+      <a href="day-end.html" data-navgroup="days">দিনের হিসাব</a>
+    </nav>
+
+    <nav class="subNav" id="subNav-sales" style="display: none">
+      <a href="sales-input.html" data-nav="sales-input">বিক্রয় তথ্য</a>
+      <a href="sales-details.html" data-nav="sales-details">বিক্রয় বিস্তারিত</a>
+    </nav>
+    <nav class="subNav" id="subNav-purchase" style="display: none">
+      <a href="purchase-input.html" data-nav="purchase-input">ক্রয় তথ্য</a>
+      <a href="purchase-details.html" data-nav="purchase-details"
+        >ক্রয় বিস্তারিত</a
+      >
+    </nav>
+    <nav class="subNav" id="subNav-days" style="display: none">
+      <a href="day-end.html" data-nav="day-end">দিনের তথ্য</a>
+      <a href="daily-details.html" data-nav="daily-details">দিনের বিস্তারিত</a>
+    </nav>
+
+    <main>
+      <div class="card">
+        <div class="detailsHead">
+          <h2 style="margin: 0">দিনের বিস্তারিত</h2>
+          <div
+            style="
+              display: flex;
+              gap: 8px;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="ghost"
+              style="padding: 8px 12px; font-size: 13px"
+              onclick="renderDailyDetails()"
+            >
+              ↻ Refresh
+            </button>
+            <select id="dailyFilterMode" onchange="onFilterModeChange()">
+              <option value="all">সকল</option>
+              <option value="day">দিন</option>
+              <option value="month">মাস</option>
+              <option value="custom">নির্দিষ্ট সময়</option>
+            </select>
+            <input
+              type="date"
+              id="dailyFilterDay"
+              style="display: none"
+              onchange="renderDailyDetails()"
+            />
+            <input
+              type="month"
+              id="dailyFilterMonth"
+              style="display: none"
+              onchange="renderDailyDetails()"
+            />
+            <input
+              type="date"
+              id="dailyFilterFrom"
+              style="display: none"
+              onchange="renderDailyDetails()"
+            />
+            <span
+              id="dailyFilterToLabel"
+              style="display: none; font-size: 13px; color: var(--muted)"
+              >to</span
+            >
+            <input
+              type="date"
+              id="dailyFilterTo"
+              style="display: none"
+              onchange="renderDailyDetails()"
+            />
+          </div>
+        </div>
+
+        <div
+          id="dailyTotalRow"
+          class="itemsTotalRow"
+          style="
+            display: none;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: flex-start;
+          "
+        >
+          <span>পুর্বের জমা: <strong id="dtOpening">0.00</strong></span>
+          <span>বাসার থেকে নেওয়া: <strong id="dtReceived">0.00</strong></span>
+          <span>মাল ক্রয়: <strong id="dtPurchase">0.00</strong></span>
+          <span>বিক্রয়: <strong id="dtSales">0.00</strong></span>
+          <span>দিন শেষে জমা: <strong id="dtClosing">0.00</strong></span>
+          <span>বাসায় জমা: <strong id="dtPaid">0.00</strong></span>
+          <span>(<span id="dtCount">0</span> days)</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>তারিখ</th>
+              <th>পুর্বের জমা</th>
+              <th>বাসার থেকে নেওয়া</th>
+              <th>মাল ক্রয়</th>
+              <th>বিক্রয়</th>
+              <th>দিন শেষে জমা</th>
+              <th>বাসায় জমা</th>
+              <th style="width: 40px"></th>
+            </tr>
+          </thead>
+          <tbody id="dailyDetailsBody"></tbody>
+        </table>
+        <div id="dailyEmptyState" class="empty" style="display: none">
+          এখনো দিন শেষের কোনো এন্ট্রি যোগ করা হয়নি। দিন শেষ থেকে একটি যোগ করুন।
+        </div>
+      </div>
+    </main>
+
+    <div class="modalBg" id="settingsModal">
+      <div class="modal">
+        <h3>Cloud Database (Supabase)</h3>
+        <div class="sub">
+          Connect this app to your free Supabase project so every page's data is
+          stored online and works across devices. Leave blank to keep everything
+          on this device only.
+        </div>
+        <div class="field">
+          <label>Project URL</label>
+          <input
+            type="text"
+            id="sbUrl"
+            text="https://tbboptkqgegrlugmcpgx.supabase.co"
+          />
+        </div>
+        <div class="field">
+          <label>Anon public key</label>
+          <input
+            type="text"
+            id="sbKey"
+            text="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiYm9wdGtxZ2Vncmx1Z21jcGd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0OTA5MjUsImV4cCI6MjEwNDA2NjkyNX0.w5fcAg0J9dHeHq6AhrYe90Jn9Np7zhENp3WztexP7b8"
+          />
+        </div>
+        <div class="statusLine" id="sbStatus"></div>
+        <div class="modalActions">
+          <button class="ghost" onclick="disconnectCloud()">Disconnect</button>
+          <div style="display: flex; gap: 8px">
+            <button class="ghost" onclick="closeSettings()">Cancel</button>
+            <button class="primary" onclick="saveCloudSettings()">
+              Save & Connect
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">Saved</div>
+
+    <script src="app.js"></script>
+    <script>
+      const STORE_KEY2 = "dayEndEntries";
+      const TABLE2 = "day_end_entries";
+
+      function fromDB2(row) {
+        return {
+          id: row.id,
+          date: row.entry_date,
+          opening: Number(row.opening_cash) || 0,
+          received: Number(row.received_from_home) || 0,
+          purchase: Number(row.todays_purchase) || 0,
+          sales: Number(row.sales) || 0,
+          closing: Number(row.closing_cash) || 0,
+          paid: Number(row.paid_to_home) || 0,
+        };
+      }
+
+      function onFilterModeChange() {
+        const mode = document.getElementById("dailyFilterMode").value;
+        document.getElementById("dailyFilterDay").style.display =
+          mode === "day" ? "" : "none";
+        document.getElementById("dailyFilterMonth").style.display =
+          mode === "month" ? "" : "none";
+        document.getElementById("dailyFilterFrom").style.display =
+          mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterToLabel").style.display =
+          mode === "custom" ? "" : "none";
+        document.getElementById("dailyFilterTo").style.display =
+          mode === "custom" ? "" : "none";
+        renderDailyDetails();
+      }
+
+      async function renderDailyDetails() {
+        let entries;
+        if (isCloudConfigured()) {
+          try {
+            const rows = await cloudFetch(TABLE2, "entry_date.desc");
+            entries = rows.map(fromDB2);
+            saveLocal(STORE_KEY2, entries);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            entries = loadLocal(STORE_KEY2);
+          }
+        } else {
+          updateSyncDot("off");
+          entries = loadLocal(STORE_KEY2);
+        }
+
+        entries = entries.slice().sort((a, b) => b.date.localeCompare(a.date));
+
+        const mode = document.getElementById("dailyFilterMode").value;
+        let filtered = entries;
+        if (mode === "day") {
+          const d = document.getElementById("dailyFilterDay").value;
+          filtered = d ? entries.filter((e) => e.date === d) : entries;
+        } else if (mode === "month") {
+          const m = document.getElementById("dailyFilterMonth").value;
+          filtered = m
+            ? entries.filter((e) => e.date.slice(0, 7) === m)
+            : entries;
+        } else if (mode === "custom") {
+          const from = document.getElementById("dailyFilterFrom").value;
+          const to = document.getElementById("dailyFilterTo").value;
+          filtered = entries.filter(
+            (e) => (!from || e.date >= from) && (!to || e.date <= to),
+          );
+        }
+
+        const body = document.getElementById("dailyDetailsBody");
+        body.innerHTML = "";
+        document.getElementById("dailyEmptyState").style.display =
+          filtered.length ? "none" : "block";
+
+        filtered.forEach((e) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+      <td>${formatDate(e.date)}</td>
+      <td>${e.opening.toFixed(2)}</td>
+      <td>${e.received.toFixed(2)}</td>
+      <td>${e.purchase.toFixed(2)}</td>
+      <td>${e.sales.toFixed(2)}</td>
+      <td><strong>${e.closing.toFixed(2)}</strong></td>
+      <td>${e.paid.toFixed(2)}</td>
+          `;
+          // <td><button class="iconBtn" title="Delete" onclick="deleteDayEnd('${e.id}')">✕</button></td>
+          body.appendChild(tr);
+        });
+
+        const sum = (key) => filtered.reduce((s, e) => s + e[key], 0);
+        document.getElementById("dtOpening").textContent =
+          sum("opening").toFixed(2);
+        document.getElementById("dtReceived").textContent =
+          sum("received").toFixed(2);
+        document.getElementById("dtPurchase").textContent =
+          sum("purchase").toFixed(2);
+        document.getElementById("dtSales").textContent =
+          sum("sales").toFixed(2);
+        document.getElementById("dtClosing").textContent =
+          sum("closing").toFixed(2);
+        document.getElementById("dtPaid").textContent = sum("paid").toFixed(2);
+        document.getElementById("dtCount").textContent = filtered.length;
+        document.getElementById("dailyTotalRow").style.display = filtered.length
+          ? "flex"
+          : "none";
+      }
+
+      async function deleteDayEnd(id) {
+        if (!confirm("Delete this day end entry?")) return;
+
+        const local = loadLocal(STORE_KEY2).filter((e) => e.id !== id);
+        saveLocal(STORE_KEY2, local);
+
+        if (isCloudConfigured()) {
+          try {
+            await cloudDelete(TABLE2, id);
+            updateSyncDot("ok");
+          } catch (err) {
+            updateSyncDot("error");
+            showToast("Deleted locally — cloud delete failed", true);
+            renderDailyDetails();
+            return;
+          }
+        }
+        renderDailyDetails();
+        showToast("Entry deleted");
+      }
+
+      function onCloudReconnect() {
+        renderDailyDetails();
+      }
+
+      renderDailyDetails();
+    </script>
+  </body>
+</html>
