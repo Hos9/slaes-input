@@ -220,6 +220,28 @@ async function sumEntriesForDate(storeKey, table, iso) {
     .reduce((s, e) => s + (Number(e.total) || 0), 0);
 }
 
+/* Sum the "মোবাইল এ জমা" (mobile_amount) part of that day's sales entries. */
+async function sumMobileForDate(iso) {
+  if (isCloudConfigured()) {
+    try {
+      const { url, key } = getCloudConfig();
+      const res = await fetch(
+        `${url}/rest/v1/sales_entries?select=mobile_amount&entry_date=eq.${iso}`,
+        { headers: { apikey: key, Authorization: `Bearer ${key}` } },
+      );
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const rows = await res.json();
+      updateSyncDot("ok");
+      return rows.reduce((s, r) => s + (Number(r.mobile_amount) || 0), 0);
+    } catch (err) {
+      updateSyncDot("error");
+    }
+  }
+  return loadLocal("salesEntries")
+    .filter((e) => e.date === iso)
+    .reduce((s, e) => s + (Number(e.mobile) || 0), 0);
+}
+
 /* ---------- Local storage helpers ---------- */
 function loadLocal(storeKey) {
   try {
@@ -240,6 +262,7 @@ function toDBEntry(e) {
     entry_time: e.time,
     total: e.total,
     items: e.items,
+    mobile_amount: e.mobile, // sales only; undefined (dropped) for purchases
   };
 }
 function fromDBEntry(row) {
@@ -249,6 +272,7 @@ function fromDBEntry(row) {
     time: row.entry_time,
     total: Number(row.total),
     items: row.items || [],
+    mobile: Number(row.mobile_amount) || 0,
   };
 }
 

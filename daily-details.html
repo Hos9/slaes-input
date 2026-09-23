@@ -123,6 +123,7 @@
           <span>মাল ক্রয়: <strong id="dtPurchase">0.00</strong></span>
           <span>বিক্রয়: <strong id="dtSales">0.00</strong></span>
           <span>দিন শেষে জমা: <strong id="dtClosing">0.00</strong></span>
+          <span>মোবাইল এ জমা: <strong id="dtMobile">0.00</strong></span>
           <span>বাসায় জমা: <strong id="dtPaid">0.00</strong></span>
           <span>(<span id="dtCount">0</span> days)</span>
         </div>
@@ -136,6 +137,7 @@
               <th>মাল ক্রয়</th>
               <th>বিক্রয়</th>
               <th>দিন শেষে জমা</th>
+              <th>মোবাইল এ জমা</th>
               <th>বাসায় জমা</th>
               <th style="width: 40px"></th>
             </tr>
@@ -201,6 +203,7 @@
           purchase: Number(row.todays_purchase) || 0,
           sales: Number(row.sales) || 0,
           closing: Number(row.closing_cash) || 0,
+          mobile: Number(row.mobile_deposit) || 0,
           paid: Number(row.paid_to_home) || 0,
         };
       }
@@ -271,13 +274,14 @@
       <td>${e.purchase.toFixed(2)}</td>
       <td>${e.sales.toFixed(2)}</td>
       <td><strong>${e.closing.toFixed(2)}</strong></td>
+      <td>${(e.mobile || 0).toFixed(2)}</td>
       <td>${e.paid.toFixed(2)}</td>
           `;
           // <td><button class="iconBtn" title="Delete" onclick="deleteDayEnd('${e.id}')">✕</button></td>
           body.appendChild(tr);
         });
 
-        const sum = (key) => filtered.reduce((s, e) => s + e[key], 0);
+        const sum = (key) => filtered.reduce((s, e) => s + (e[key] || 0), 0);
         document.getElementById("dtOpening").textContent =
           sum("opening").toFixed(2);
         document.getElementById("dtReceived").textContent =
@@ -288,6 +292,8 @@
           sum("sales").toFixed(2);
         document.getElementById("dtClosing").textContent =
           sum("closing").toFixed(2);
+        document.getElementById("dtMobile").textContent =
+          sum("mobile").toFixed(2);
         document.getElementById("dtPaid").textContent = sum("paid").toFixed(2);
         document.getElementById("dtCount").textContent = filtered.length;
         document.getElementById("dailyTotalRow").style.display = filtered.length

@@ -164,10 +164,66 @@
           </div>
         </div>
 
-        <div class="itemsTotalRow" style="justify-content: space-between">
+        <!-- মোবাইল এ জমা — auto-filled from that day's বিক্রয় তথ্য (editable) -->
+        <div class="totalBox mobileBox">
+          <div>
+            <label for="dayEndMobile">
+              <span class="mobileTag">📱 মোবাইল এ জমা</span>
+              <button
+                type="button"
+                class="iconBtn"
+                style="
+                  width: 20px;
+                  height: 20px;
+                  font-size: 11px;
+                  margin-left: 4px;
+                "
+                title="Refresh from বিক্রয় তথ্য (মোবাইল এ জমা)"
+                onclick="refreshMobileTotal()"
+              >
+                ↻
+              </button>
+            </label>
+            <div class="hint">
+              আজকের বিক্রয় তথ্য থেকে স্বয়ংক্রিয়ভাবে আনা হয় — প্রয়োজনে পরিবর্তন
+              করা যাবে।
+            </div>
+          </div>
+          <div>
+            <input
+              type="number"
+              class="mobileInput"
+              id="dayEndMobile"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="totalBox">
+          <div>
+            <label>বাসায় জমা দেওয়া</label>
+            <div class="hint">
+              পুর্বের জমা টাকা + বাসার থেকে নেওয়া − আজকের মাল ক্রয় + আজকের মাল
+              বিক্রয় − আজকের ক্যাশে জমা − মোবাইল এ জমা
+            </div>
+          </div>
+          <div>
+            <input
+              type="text"
+              id="paidToHomeField"
+              class="mobileInput"
+              style="border-color: var(--green)"
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="itemsTotalRow formulaRow" style="justify-content: flex-start">
+          <span id="formulaBreakdown"></span>
           <span
-            >প্রত্যাশিত: প্রারম্ভিক + প্রাপ্ত − ক্রয় + বিক্রয় − সমাপনী =
-            <strong id="paidToHomeDisplay">0.00</strong> (বাসায় জমা দেওয়া)</span
+            >= <strong id="paidToHomeDisplay">0.00</strong> (বাসায় জমা দেওয়া)</span
           >
         </div>
 
@@ -233,6 +289,7 @@
           todays_purchase: e.purchase,
           sales: e.sales,
           closing_cash: e.closing,
+          mobile_deposit: e.mobile,
           paid_to_home: e.paid,
         };
       }
@@ -249,9 +306,15 @@
           parseFloat(document.getElementById("dayEndSales").dataset.value) || 0;
         const closing =
           parseFloat(document.getElementById("closingCash").value) || 0;
-        const paid = opening + received - purchase + sales - closing;
-        document.getElementById("paidToHomeDisplay").textContent =
-          paid.toFixed(2);
+        const mobile =
+          parseFloat(document.getElementById("dayEndMobile").value) || 0;
+        // পুর্বের জমা + বাসার থেকে নেওয়া − মাল ক্রয় + মাল বিক্রয় − ক্যাশে জমা − মোবাইল এ জমা
+        const paid = opening + received - purchase + sales - closing - mobile;
+        const f = (n) => n.toFixed(2);
+        document.getElementById("formulaBreakdown").textContent =
+          `${f(opening)} + ${f(received)} − ${f(purchase)} + ${f(sales)} − ${f(closing)} − ${f(mobile)}`;
+        document.getElementById("paidToHomeDisplay").textContent = f(paid);
+        document.getElementById("paidToHomeField").value = f(paid);
         return paid;
       }
 
@@ -285,6 +348,17 @@
         recalcPaidToHome();
       }
 
+      async function refreshMobileTotal() {
+        const iso =
+          document.getElementById("dayEndDate").dataset.iso || todayISO();
+        const field = document.getElementById("dayEndMobile");
+        field.placeholder = "Loading...";
+        const sum = await sumMobileForDate(iso);
+        field.placeholder = "0.00";
+        field.value = sum ? sum.toFixed(2) : "";
+        recalcPaidToHome();
+      }
+
       async function resetDayEndForm() {
         const iso = todayISO();
         const dateInput = document.getElementById("dayEndDate");
@@ -302,10 +376,19 @@
           ? mostRecent.closing
           : "";
 
-        await Promise.all([refreshSalesTotal(), refreshPurchaseTotal()]);
+        await Promise.all([
+          refreshSalesTotal(),
+          refreshPurchaseTotal(),
+          refreshMobileTotal(),
+        ]);
       }
 
-      ["openingCash", "receivedFromHome", "closingCash"].forEach((id) => {
+      [
+        "openingCash",
+        "receivedFromHome",
+        "closingCash",
+        "dayEndMobile",
+      ].forEach((id) => {
         document.getElementById(id).addEventListener("input", recalcPaidToHome);
       });
 
@@ -329,6 +412,8 @@
             0,
           closing:
             parseFloat(document.getElementById("closingCash").value) || 0,
+          mobile:
+            parseFloat(document.getElementById("dayEndMobile").value) || 0,
           paid: Math.round(paid * 100) / 100,
         };
 

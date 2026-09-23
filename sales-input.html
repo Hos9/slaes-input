@@ -95,6 +95,31 @@
           মোট বিক্রয়ের পরিমাণ আবশ্যক এবং তা অবশ্যই 0-এর বেশি হতে হবে।
         </div>
 
+        <!-- মোবাইল এ জমা — separate tag: part of the sale received via bKash/Nagad/Rocket etc. -->
+        <div class="totalBox mobileBox">
+          <div>
+            <label for="mobileAmount"
+              ><span class="mobileTag">📱 মোবাইল এ জমা</span></label
+            >
+            <div class="hint">
+              মোট বিক্রয়ের মধ্যে যে টাকা মোবাইলে (বিকাশ/নগদ/রকেট) পাওয়া গেছে।
+              ঐচ্ছিক — না থাকলে খালি রাখুন।
+            </div>
+          </div>
+          <div>
+            <input
+              type="number"
+              id="mobileAmount"
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+        <div class="errMsg" id="mobileErr">
+          মোবাইল এ জমা মোট বিক্রয়ের চেয়ে বেশি হতে পারবে না।
+        </div>
+
         <div class="actions">
           <button class="ghost" onclick="resetForm()">Clear</button>
           <button class="primary" id="saveBtn" onclick="saveEntry()">
@@ -258,7 +283,16 @@
       function clearTotalError() {
         document.getElementById("totalAmount").classList.remove("err");
         document.getElementById("totalErr").style.display = "none";
+        clearMobileError();
       }
+
+      function clearMobileError() {
+        document.getElementById("mobileAmount").classList.remove("err");
+        document.getElementById("mobileErr").style.display = "none";
+      }
+      document
+        .getElementById("mobileAmount")
+        .addEventListener("input", clearMobileError);
 
       function setDefaultDateTime() {
         const now = new Date();
@@ -274,6 +308,7 @@
         buildItemsTable();
         setDefaultDateTime();
         document.getElementById("totalAmount").value = "";
+        document.getElementById("mobileAmount").value = "";
         totalManuallyEdited = false;
         recalcItemsSum();
         clearTotalError();
@@ -287,6 +322,15 @@
           totalInput.classList.add("err");
           document.getElementById("totalErr").style.display = "block";
           totalInput.focus();
+          return;
+        }
+
+        const mobileInput = document.getElementById("mobileAmount");
+        const mobile = parseFloat(mobileInput.value) || 0;
+        if (mobile < 0 || mobile > total) {
+          mobileInput.classList.add("err");
+          document.getElementById("mobileErr").style.display = "block";
+          mobileInput.focus();
           return;
         }
 
@@ -318,6 +362,7 @@
           date,
           time,
           total: Math.round(total * 100) / 100,
+          mobile: Math.round(mobile * 100) / 100,
           items,
         };
 

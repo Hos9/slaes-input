@@ -89,6 +89,9 @@
           style="display: none; justify-content: space-between"
         >
           <span>মোট <strong id="filterTotalDate"></strong></span>
+          <span class="mobileTag sm"
+            >📱 মোবাইল এ জমা: <span id="filterMobileAmount">0.00</span></span
+          >
           <span
             ><strong id="filterTotalAmount">0.00</strong> (<span
               id="filterTotalCount"
@@ -196,6 +199,9 @@
             sum.toFixed(2);
           document.getElementById("filterTotalCount").textContent =
             filtered.length;
+          document.getElementById("filterMobileAmount").textContent = filtered
+            .reduce((s, e) => s + (Number(e.mobile) || 0), 0)
+            .toFixed(2);
           filterTotalRow.style.display = "flex";
         } else {
           filterTotalRow.style.display = "none";
@@ -212,7 +218,7 @@
           tr.innerHTML = `
       <td>${formatDate(e.date)}</td>
       <td>${e.time || "—"}</td>
-      <td><strong>${e.total.toFixed(2)}</strong></td>
+      <td><strong>${e.total.toFixed(2)}</strong>${e.mobile ? `<span class="mobileTag sm">📱 ${Number(e.mobile).toFixed(2)}</span>` : ""}</td>
       <td>${e.items && e.items.length ? `<button class="expandBtn" onclick="toggleExpand('${e.id}')">Items (${e.items.length})</button>` : ""}</td>
           `;
           // <td class="rowActions"><button class="iconBtn" title="Delete" onclick="deleteEntry('${e.id}')">✕</button></td>
