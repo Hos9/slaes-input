@@ -203,7 +203,13 @@
           purchase: Number(row.todays_purchase) || 0,
           sales: Number(row.sales) || 0,
           closing: Number(row.closing_cash) || 0,
-          mobile: Number(row.mobile_deposit) || 0,
+          mobile:
+            row.mobile_deposit != null
+              ? Number(row.mobile_deposit) || 0
+              : Number(
+                  (loadLocal(STORE_KEY2).find((e) => e.id === row.id) || {})
+                    .mobile,
+                ) || 0,
           paid: Number(row.paid_to_home) || 0,
         };
       }

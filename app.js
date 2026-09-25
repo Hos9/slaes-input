@@ -169,19 +169,40 @@ async function cloudFetch(table, orderBy) {
   if (!res.ok) throw new Error("HTTP " + res.status);
   return res.json();
 }
+/* Columns added in newer versions (e.g. mobile_amount / mobile_deposit).
+   If the Supabase table hasn't been migrated yet, the save is retried
+   without them so cloud sync keeps working (value stays in local copy). */
+const OPTIONAL_COLUMNS = ["mobile_amount", "mobile_deposit"];
+
 async function cloudUpsert(table, row) {
   const { url, key } = getCloudConfig();
-  const res = await fetch(`${url}/rest/v1/${table}?on_conflict=id`, {
-    method: "POST",
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=representation",
-    },
-    body: JSON.stringify([row]),
-  });
-  if (!res.ok) throw new Error("HTTP " + res.status);
+  let body = { ...row };
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await fetch(`${url}/rest/v1/${table}?on_conflict=id`, {
+      method: "POST",
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=representation",
+      },
+      body: JSON.stringify([body]),
+    });
+    if (res.ok) return;
+    const text = await res.text().catch(() => "");
+    const m = text.match(/Could not find the '([^']+)' column/i);
+    if (m && OPTIONAL_COLUMNS.includes(m[1]) && m[1] in body) {
+      console.warn(
+        `[cloud] Column "${m[1]}" missing in "${table}". Run the SQL in schema.sql to sync it. Saving without it.`,
+      );
+      localStorage.setItem("missingCol_" + table + "_" + m[1], "1");
+      delete body[m[1]];
+      continue;
+    }
+    console.error("[cloud] upsert failed", res.status, text);
+    throw new Error("HTTP " + res.status);
+  }
+  throw new Error("upsert retries exhausted");
 }
 async function cloudDelete(table, id) {
   const { url, key } = getCloudConfig();
@@ -226,13 +247,21 @@ async function sumMobileForDate(iso) {
     try {
       const { url, key } = getCloudConfig();
       const res = await fetch(
-        `${url}/rest/v1/sales_entries?select=mobile_amount&entry_date=eq.${iso}`,
+        `${url}/rest/v1/sales_entries?select=*&entry_date=eq.${iso}`,
         { headers: { apikey: key, Authorization: `Bearer ${key}` } },
       );
       if (!res.ok) throw new Error("HTTP " + res.status);
       const rows = await res.json();
       updateSyncDot("ok");
-      return rows.reduce((s, r) => s + (Number(r.mobile_amount) || 0), 0);
+      const localById = {};
+      loadLocal("salesEntries").forEach((e) => (localById[e.id] = e));
+      return rows.reduce((s, r) => {
+        const v =
+          r.mobile_amount != null
+            ? r.mobile_amount
+            : localById[r.id] && localById[r.id].mobile;
+        return s + (Number(v) || 0);
+      }, 0);
     } catch (err) {
       updateSyncDot("error");
     }
@@ -272,7 +301,10 @@ function fromDBEntry(row) {
     time: row.entry_time,
     total: Number(row.total),
     items: row.items || [],
-    mobile: Number(row.mobile_amount) || 0,
+    mobile:
+      row.mobile_amount != null
+        ? Number(row.mobile_amount) || 0
+        : Number((loadLocal("salesEntries").find((e) => e.id === row.id) || {}).mobile) || 0,
   };
 }
 
